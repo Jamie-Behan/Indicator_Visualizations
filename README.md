@@ -1,5 +1,8 @@
 # Indicator Visualizations
 ## An RShiny user interface for visualizing an integrated ecosystem assessment focused on characterizing the status and trends of the fishery ecosystem in Maine’s coastal waters
+ 
+  <img align="right" src="https://user-images.githubusercontent.com/62613926/193351505-0bfa74f0-60ca-47a3-8895-dec2e9dfbd15.png" width="250" alt="My Image">
+
 ### **Included in this Repository is the following:**
 
 ###   **1. "Code" folder containing R code used to build Shiny app:**
