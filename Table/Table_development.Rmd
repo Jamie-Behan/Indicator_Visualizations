@@ -72,7 +72,7 @@ st_crs(surveys_sf) <- "EPSG: 4326"
 
 
 ```{r pointsPlot}
-ggplot() +
+pointsplot <- ggplot() +
   geom_contour_filled(data = BathyData, aes(x = lon, y = lat, z = value),
                       breaks = c(0, -50, -100, -200, -300, -400, -500, -5000)) + # Specify custom bathymetric lines to keep
   geom_sf(data=surveys_sf, pch='x', col="black", cex=1, alpha=0.5) +
@@ -81,7 +81,7 @@ ggplot() +
   xlab("Longitude") + # Update axis labels
   ylab("Latitude") +
   scale_fill_manual(values =  c("#DEF5E5FF", "#A0DFB9FF", "#54C9ADFF", "#38AAACFF", "#348AA6FF", "#366A9FFF", "#40498EFF"), name = "Depth (m)", labels = c("[0,50)", "[50,100)", "[100, 200)", "[200, 300)", "[300,400)", "[400,500)", "[500,5000)" )) + # Pick specific colors and label them to match the bathymetric lines so we end up with a nice legend and colors
-  coord_sf(xlim = c(-71, -63.5),  ylim = c(40.0, 43.9)) + # Trim the map dimensions a bit and fix the horizontal stretch. !!! Change this if you want to zoom in/out on a specific area
+  coord_sf(xlim = c(-71, -65.0),  ylim = c(40.0, 43.9)) + # Trim the map dimensions a bit and fix the horizontal stretch. !!! Change this if you want to zoom in/out on a specific area
   theme_void() + # Change the background theme, there are lots of options to explore
   theme(panel.background=element_rect(fill="gray"), legend.position = "none")
 ```
