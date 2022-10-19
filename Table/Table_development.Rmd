@@ -1,0 +1,50 @@
+---
+title: "**Table development starter**"
+geometry: "left=0.75in,right=0.75in,top=1in,bottom=1in"
+output:
+  bookdown::pdf_document2:
+    toc: no
+    number_sections: false
+urlcolor: blue
+documentclass: article
+header-includes:
+    - \usepackage{setspace}\onehalfspacing
+    - \usepackage{float}
+    - \usepackage{fancyhdr}
+    - \pagestyle{fancy}
+fontsize: 12pt
+sansfont: Calibri
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
+knitr::opts_chunk$set(fig.pos = "H", out.extra = "")
+library(tidyverse, quietly=T, verbose=F)
+library(knitr, quietly=T, verbose=F)
+library(kableExtra, quietly=T, verbose=F)
+data("iris")
+iris <- head(iris,5)
+```
+
+```{r extraPic, echo=F}
+iris %>% 
+  mutate_at(vars(Petal.Length), 
+            funs(factor)) %>% 
+  mutate(Picture=" ") %>% 
+  kable(
+    caption = "Add picture",
+    booktabs=TRUE,
+    align="cccccc"
+    ) %>%
+  kableExtra::kable_styling(
+      latex_options ="HOLD_position"
+    )%>% 
+  row_spec(0, background="darkgray", color="white") %>% 
+  pack_rows(index = c("1.3" = 1, "1.4" = 3, "1.5" = 1),
+            background="gray!10",
+            hline_before=T, hline_after = T,
+            latex_align = "c") %>% 
+  #column_spec(6, image = "jigging_substrate_rs.png") %>% 
+  column_spec(1:6,
+              width = c(rep("0.75in",5), "1in"),
+              latex_valign = "m")
+```
