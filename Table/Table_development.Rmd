@@ -21,8 +21,69 @@ knitr::opts_chunk$set(fig.pos = "H", out.extra = "")
 library(tidyverse, quietly=T, verbose=F)
 library(knitr, quietly=T, verbose=F)
 library(kableExtra, quietly=T, verbose=F)
+library(marmap, quietly=T, verbose=F)
+library(sf, quietly=T,verbose=F)
 data("iris")
 iris <- head(iris,5)
+```
+
+```{r bathyadd}
+# Pull NOAA bathymetry data, you must provide the latitude/longitude bounds and a resolution (higher resolutions take more time to process)
+Bathy <- getNOAA.bathy(lon1 = -75, lon2 = -62,
+                       lat1 = 39, lat2 = 48, resolution = 1)
+
+# Now do a bit of data wrangling so we can plot it:
+# Convert data to matrix
+Bathy_Final <- as.matrix(Bathy)
+class(Bathy_Final) <- "matrix"
+
+# Now reshape it to long format and plot
+BathyData <- Bathy_Final %>%
+  as.data.frame() %>% # Convert the matrix to a data.frame
+  rownames_to_column(var = "lon") %>% # Switch to long format
+  gather(lat, value, -1) %>%
+  mutate_all(funs(as.numeric)) # Make everything a number
+
+BathyData <- read_rds("C:/Users/klankowicz/Desktop/BathymetryData.RDS")
+```
+
+```{r marmapbathy}
+ggplot() +
+  geom_contour_filled(data = BathyData, aes(x = lon, y = lat, z = value),
+                      breaks = c(0, -50, -100, -200, -300, -400, -500, -5000)) + # Specify custom bathymetric lines to keep
+  xlab("Longitude") + # Update axis labels
+  ylab("Latitude") +
+  scale_fill_manual(values =  c("#DEF5E5FF", "#A0DFB9FF", "#54C9ADFF", "#38AAACFF", "#348AA6FF", "#366A9FFF", "#40498EFF"), name = "Depth (m)", labels = c("[0,50)", "[50,100)", "[100, 200)", "[200, 300)", "[300,400)", "[400,500)", "[500,5000)" )) + # Pick specific colors and label them to match the bathymetric lines so we end up with a nice legend and colors
+  coord_sf(xlim = c(-74, -64),  ylim = c(40, 47.3)) + # Trim the map dimensions a bit and fix the horizontal stretch. !!! Change this if you want to zoom in/out on a specific area
+  theme_void() + # Change the background theme, there are lots of options to explore
+  theme(panel.background=element_rect(fill="gray"), legend.position = "none")
+
+```
+```{r loadData}
+survey_data <- read.csv(paste0('C:/Users/klankowicz/Box/Katie Lankowicz/',
+                               'Groundfish_Survey_Data_Mods/Collated_Data/',
+                               'Survey_Data.csv'))
+survey_data <- subset(survey_data, SURVEY=="NEFSC BTS")
+survey_data <- subset(survey_data, STOCK=="WGOM")
+surveys_sf <- st_as_sf(survey_data, coords=c("LON", "LAT"),
+                       na.fail=T)
+st_crs(surveys_sf) <- "EPSG: 4326"
+```
+
+
+```{r pointsPlot}
+ggplot() +
+  geom_contour_filled(data = BathyData, aes(x = lon, y = lat, z = value),
+                      breaks = c(0, -50, -100, -200, -300, -400, -500, -5000)) + # Specify custom bathymetric lines to keep
+  geom_sf(data=surveys_sf, pch='x', col="black", cex=1, alpha=0.5) +
+  #xlim(st_bbox(surveys_sf)[1], st_bbox(surveys_sf)[3]) +
+  #ylim(st_bbox(surveys_sf)[2], st_bbox(surveys_sf)[4]) +
+  xlab("Longitude") + # Update axis labels
+  ylab("Latitude") +
+  scale_fill_manual(values =  c("#DEF5E5FF", "#A0DFB9FF", "#54C9ADFF", "#38AAACFF", "#348AA6FF", "#366A9FFF", "#40498EFF"), name = "Depth (m)", labels = c("[0,50)", "[50,100)", "[100, 200)", "[200, 300)", "[300,400)", "[400,500)", "[500,5000)" )) + # Pick specific colors and label them to match the bathymetric lines so we end up with a nice legend and colors
+  coord_sf(xlim = c(-71, -63.5),  ylim = c(40.0, 43.9)) + # Trim the map dimensions a bit and fix the horizontal stretch. !!! Change this if you want to zoom in/out on a specific area
+  theme_void() + # Change the background theme, there are lots of options to explore
+  theme(panel.background=element_rect(fill="gray"), legend.position = "none")
 ```
 
 ```{r extraPic, echo=F}
