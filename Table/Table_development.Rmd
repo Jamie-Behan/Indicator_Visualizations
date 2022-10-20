@@ -118,3 +118,17 @@ iris %>%
               width = c(rep("0.75in",5), "1in"),
               latex_valign = "m")
 ```
+
+Try using gt for plot - this lets you add a ggplot into a table but I haven't tested to see if you can add tooltips
+```{r}
+library("gt")
+dplyr::tibble(column1 = "trawl data", map = NA) %>% # Placeholder tibble with NA for map
+  gt() %>% # Turn tibble into gt table
+  text_transform(
+    locations = cells_body(columns = map), # Turn map object into ggplot image
+    fn = function(x){
+      MAP %>% ggplot_image(height = px(200))
+    }
+  )
+  
+```
