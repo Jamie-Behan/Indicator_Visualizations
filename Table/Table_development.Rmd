@@ -24,6 +24,8 @@ library(knitr, quietly=T, verbose=F)
 library(kableExtra, quietly=T, verbose=F)
 library(marmap, quietly=T, verbose=F)
 library(sf, quietly=T,verbose=F)
+library(ggiraph)
+library(gtExtras)
 data("iris")
 iris <- head(iris,5)
 ```
@@ -49,7 +51,7 @@ iris <- head(iris,5)
 BathyData <- read_rds(paste0(getwd(), "/Data/BathymetryData.RDS"))
 ```
 
-```{r PlotMarmapBathy}
+```{r PlotMarmapBathy, eval=FALSE}
 ggplot() +
   geom_contour_filled(data = BathyData, aes(x = lon, y = lat, z = value),
                       breaks = c(0, -50, -100, -200, -300, -400, -500, -5000)) + # Specify custom bathymetric lines to keep
@@ -79,16 +81,20 @@ st_crs(surveys_sf) <- "EPSG: 4326"
 
 
 ```{r plotBathySurvey}
+library(leaflet)
+
+surveys_sf <- head(surveys_sf, n=10)
 # Plot survey points over bathymetry
 pointsplot <- ggplot() +
   geom_contour_filled(data = BathyData, aes(x = lon, y = lat, z = value),
                       breaks = c(0, -50, -100, -200, -300, -400, -500, -5000)) + # Specify custom bathymetric lines to keep
+  # geom_point_interactive(data=surveys_sf,aes(tooltip=YEAR)) + 
   geom_sf(data=surveys_sf, pch='x', col="black", cex=1, alpha=0.5) +
   #xlim(st_bbox(surveys_sf)[1], st_bbox(surveys_sf)[3]) +
   #ylim(st_bbox(surveys_sf)[2], st_bbox(surveys_sf)[4]) +
   xlab("Longitude") + # Update axis labels
   ylab("Latitude") +
-  # scale_fill_manual(values =  c("#DEF5E5FF", "#A0DFB9FF", "#54C9ADFF", "#38AAACFF", "#348AA6FF", "#366A9FFF", "#40498EFF"), name = "Depth (m)", labels = c("[0,50)", "[50,100)", "[100, 200)", "[200, 300)", "[300,400)", "[400,500)", "[500,5000)" )) + # Pick specific colors and label them to match the bathymetric lines so we end up with a nice legend and colors
+  scale_fill_manual(values =  c("#DEF5E5FF", "#A0DFB9FF", "#54C9ADFF", "#38AAACFF", "#348AA6FF", "#366A9FFF", "#40498EFF"), name = "Depth (m)", labels = c("[0,50)", "[50,100)", "[100, 200)", "[200, 300)", "[300,400)", "[400,500)", "[500,5000)" )) + # Pick specific colors and label them to match the bathymetric lines so we end up with a nice legend and colors
   coord_sf(xlim = c(-71, -66.0),  ylim = c(40.0, 44.5)) + # Trim the map dimensions a bit and fix the horizontal stretch. !!! Change this if you want to zoom in/out on a specific area
   theme_void() + # Change the background theme, there are lots of options to explore
   theme(panel.background=element_rect(fill="gray"), legend.position = "none")
@@ -96,7 +102,7 @@ pointsplot <- ggplot() +
 plot(pointsplot)
 ```
 
-```{r extraPic}
+```{r extraPic, eval=FALSE}
 iris %>% 
   mutate_at(vars(Petal.Length), 
             funs(factor)) %>% 
@@ -163,29 +169,30 @@ df %>%
 
 
 
-Try using gt for plot - this lets you add a ggplot into a table but I haven't tested to see if you can add tooltips
+# Current working copy of table!!!!!!
 ```{r}
 library("gt")
 dplyr::tibble(Dataset=c("Bottom Temp Anomaly", "NMFS Bottom Trawl Survey"),
                Description= c("In situ bottom temperature anomalmy values (1981-2010 reference period)", "BT trawl survey"),
-               Units= c("Degrees C", "Number? fish"),
+               Units= c("Degrees C", "Number of fish"),
                Source= c("ecodata package in R", "NOAA"),
-               Timeseries= c("", ""), Distribution = c(NA,NA)) %>% # Placeholder tibble with NA for map
+               Timeseries= list(c(bottom_temp$Anomalies), c(bottom_temp$Anomalies)), Distribution = c(NA,NA)) %>% # Placeholder tibble with NA for map
   gt() %>% # Turn tibble into gt table
   text_transform(
     locations = cells_body(columns = Distribution), # Turn map object into ggplot image
     fn = function(x){
       pointsplot %>% ggplot_image(height = px(200))
     }
-  )
+  ) %>% 
+  gt_plt_sparkline(Timeseries, fig_dim = c(50,60))
   
 ```
+               
+Current issues 
+- gt no tooltip interactivity for map
+- ggplot points not showing up in gt
+-sparklines are ugly - Amanda look at
+- Amanda look into multiple graphs 
+- Jamie look into timeseries x axis labels - or add tool tips - maybe add 
+-ggplotly doesn't work for geom_contours - could find another tool, could change data Katie works on this
 
-Dataset="Bottom Temp Anomaly",
-               Description= "In situ bottom temperature anomalmy values (1981-2010 reference period)",
-               Units= "Degrees C",
-               Source= "ecodata package in R",
-               Histogram= "",
-               Bar_Plot="",
-               Boxplot="",
-               Timeseries= ""
