@@ -88,7 +88,7 @@ pointsplot <- ggplot() +
   #ylim(st_bbox(surveys_sf)[2], st_bbox(surveys_sf)[4]) +
   xlab("Longitude") + # Update axis labels
   ylab("Latitude") +
-  scale_fill_manual(values =  c("#DEF5E5FF", "#A0DFB9FF", "#54C9ADFF", "#38AAACFF", "#348AA6FF", "#366A9FFF", "#40498EFF"), name = "Depth (m)", labels = c("[0,50)", "[50,100)", "[100, 200)", "[200, 300)", "[300,400)", "[400,500)", "[500,5000)" )) + # Pick specific colors and label them to match the bathymetric lines so we end up with a nice legend and colors
+  # scale_fill_manual(values =  c("#DEF5E5FF", "#A0DFB9FF", "#54C9ADFF", "#38AAACFF", "#348AA6FF", "#366A9FFF", "#40498EFF"), name = "Depth (m)", labels = c("[0,50)", "[50,100)", "[100, 200)", "[200, 300)", "[300,400)", "[400,500)", "[500,5000)" )) + # Pick specific colors and label them to match the bathymetric lines so we end up with a nice legend and colors
   coord_sf(xlim = c(-71, -66.0),  ylim = c(40.0, 44.5)) + # Trim the map dimensions a bit and fix the horizontal stretch. !!! Change this if you want to zoom in/out on a specific area
   theme_void() + # Change the background theme, there are lots of options to explore
   theme(panel.background=element_rect(fill="gray"), legend.position = "none")
@@ -120,16 +120,72 @@ iris %>%
               latex_valign = "m")
 ```
 
+```{r}
+
+pacman::p_load(here,ecodata,knitr,dplyr,sparkline,kableExtra) 
+here()
+
+bottom_temp<-ecodata::bottom_temp
+bottom_temp<-bottom_temp[(bottom_temp$EPU == "GOM") & (bottom_temp$Var == "bottom temp anomaly in situ"), ]
+bottom_temp<-bottom_temp[c(1,3)]
+names(bottom_temp)[1] <- "Year"
+names(bottom_temp)[2] <- "Anomalies"
+
+plot(bottom_temp$Year,bottom_temp$Anomalies)
+lines(bottom_temp$Year,bottom_temp$Anomalies)
+hist<-hist(bottom_temp$Anomalies)
+barplot(hist$density)
+#########dataframe##############
+df<-data.frame(Dataset="Bottom Temp Anomaly",
+               Description= "In situ bottom temperature anomalmy values (1981-2010 reference period)",
+               Units= "Degrees C",
+               Source= "ecodata package in R",
+               Histogram= "",
+               Bar_Plot="",
+               Boxplot="",
+               Timeseries= "")
+
+
+
+
+#########################################
+
+df %>%
+  kable(
+    caption = "Row styling",
+  ) %>%
+  kableExtra::kable_styling(
+    latex_options = c("HOLD_position","striped"),
+    stripe_color = "gray!10"
+  )
+
+```
+
+
+
 Try using gt for plot - this lets you add a ggplot into a table but I haven't tested to see if you can add tooltips
 ```{r}
 library("gt")
-dplyr::tibble(column1 = "trawl data", map = NA) %>% # Placeholder tibble with NA for map
+dplyr::tibble(Dataset=c("Bottom Temp Anomaly", "NMFS Bottom Trawl Survey"),
+               Description= c("In situ bottom temperature anomalmy values (1981-2010 reference period)", "BT trawl survey"),
+               Units= c("Degrees C", "Number? fish"),
+               Source= c("ecodata package in R", "NOAA"),
+               Timeseries= c("", ""), Distribution = c(NA,NA)) %>% # Placeholder tibble with NA for map
   gt() %>% # Turn tibble into gt table
   text_transform(
-    locations = cells_body(columns = map), # Turn map object into ggplot image
+    locations = cells_body(columns = Distribution), # Turn map object into ggplot image
     fn = function(x){
       pointsplot %>% ggplot_image(height = px(200))
     }
   )
   
 ```
+
+Dataset="Bottom Temp Anomaly",
+               Description= "In situ bottom temperature anomalmy values (1981-2010 reference period)",
+               Units= "Degrees C",
+               Source= "ecodata package in R",
+               Histogram= "",
+               Bar_Plot="",
+               Boxplot="",
+               Timeseries= ""
