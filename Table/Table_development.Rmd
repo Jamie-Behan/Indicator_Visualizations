@@ -128,7 +128,7 @@ dplyr::tibble(column1 = "trawl data", map = NA) %>% # Placeholder tibble with NA
   text_transform(
     locations = cells_body(columns = map), # Turn map object into ggplot image
     fn = function(x){
-      MAP %>% ggplot_image(height = px(200))
+      pointsplot %>% ggplot_image(height = px(200))
     }
   )
   
