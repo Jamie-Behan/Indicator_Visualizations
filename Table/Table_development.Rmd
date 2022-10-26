@@ -171,20 +171,28 @@ df %>%
 
 # Current working copy of table!!!!!!
 ```{r}
+yrMean <- survey_data %>% group_by(YEAR) %>% summarise(meanCod = mean(COD_N)) # 
+
+
 library("gt")
 dplyr::tibble(Dataset=c("Bottom Temp Anomaly", "NMFS Bottom Trawl Survey"),
                Description= c("In situ bottom temperature anomalmy values (1981-2010 reference period)", "BT trawl survey"),
                Units= c("Degrees C", "Number of fish"),
                Source= c("ecodata package in R", "NOAA"),
-               Timeseries= list(c(bottom_temp$Anomalies), c(bottom_temp$Anomalies)), Distribution = c(NA,NA)) %>% # Placeholder tibble with NA for map
+               # Timeseries= list(bottom_temp$Anomalies, survey_data$COD_N), # Raw survey catch numbers
+              Timeseries = list(bottom_temp$Anomalies, yrMean$meanCod),  # mean catch numbers by year
+              Distribution = list(bottom_temp$Anomalies, NA)) %>% # Placeholder tibble with NA for map
   gt() %>% # Turn tibble into gt table
+  gt_plt_sparkline(Timeseries, fig_dim = c(50,60), same_limit = FALSE)%>% 
+  gt_plt_dist(Distribution, fig_dim = c(50,60)) %>%
   text_transform(
-    locations = cells_body(columns = Distribution), # Turn map object into ggplot image
+    locations = cells_body(columns = Distribution, rows = 2), # Turn map object into ggplot image
     fn = function(x){
       pointsplot %>% ggplot_image(height = px(200))
     }
-  ) %>% 
-  gt_plt_sparkline(Timeseries, fig_dim = c(50,60))
+  ) 
+  
+
   
 ```
                
