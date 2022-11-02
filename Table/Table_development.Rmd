@@ -190,10 +190,127 @@ dplyr::tibble(Dataset=c("Bottom Temp Anomaly", "NMFS Bottom Trawl Survey"),
     fn = function(x){
       pointsplot %>% ggplot_image(height = px(200))
     }
-  ) 
-  
+
+  )
 
   
+```
+```{r}
+#### Adding plots to timeseries column as possible work-around for lack of x-axis in sparkline plot?
+gt_add_plots <- function(gt_table, plots, col_index) {
+  purrr::walk(1:length(plots), function(x) {
+    gt_table <<- gt::text_transform(gt_table, gt::cells_body(col_index,x), fn = function(y) {
+      plots[[x]] %>%
+        gt::ggplot_image(height = gt::px(210))
+    })
+  }
+    )
+  gt_table
+}
+
+bt_anomaly_plot<-ggplot(data=bottom_temp, aes(x=Year, y=Anomalies, group=1)) +
+  geom_line(color="#00608A", size=1.2)+
+  geom_point(color="#00608A", size=1.2)+theme_classic()+
+  theme(axis.line.x.bottom=element_line(size=1.1),axis.line.y.left=element_line(size=1.1),
+        axis.text=element_text(size=12,face="bold"),
+        axis.title=element_text(size=14,face="bold"))+
+  geom_hline(yintercept=0.0,linetype=2)+
+  labs(y="Anomaly (°C)")
+
+
+BTS_Survey<-data.frame(survey_data[(survey_data$STOCK == "WGOM"), ])
+BTS_Survey<-aggregate(COD_N~YEAR,data=BTS_Survey,FUN ="mean")
+names(BTS_Survey)[2]<-"COD_N"
+
+BTS_plot<-ggplot(data=BTS_Survey, aes(x=YEAR, y=COD_N, group=1)) +
+  geom_line(color="#00608A", size=1.2)+
+  geom_point(color="#00608A", size=1.2)+theme_classic()+
+  theme(axis.line.x.bottom=element_line(size=1.1),axis.line.y.left=element_line(size=1.1),
+        axis.text=element_text(size=12,face="bold"),
+        axis.title=element_text(size=14,face="bold"))+
+  geom_hline(yintercept=0.0,linetype=2)+
+  labs(y="Number of Cod (/tow)",x="Year")
+
+
+dplyr::tibble(Dataset=c("Bottom Temp Anomaly", "NMFS Bottom Trawl Survey"),
+               Description= c("In situ bottom temperature anomalmy values (1981-2010 reference period)", "BT trawl survey"),
+               Units= c("Degrees C", "Number of fish"),
+               Source= c("ecodata package in R", "NOAA"),
+               Timeseries= list(c(bottom_temp$Anomalies), c(bottom_temp$Anomalies)), Distribution = c(NA,NA)) %>% # Placeholder tibble with NA for map
+  gt() %>% # Turn tibble into gt table
+  text_transform(
+    locations = cells_body(columns = Distribution), # Turn map object into ggplot image
+    fn = function(x){
+      pointsplot %>% ggplot_image(height = px(200))
+    }
+  ) 
+
+  gt_add_plots(gt_table,list(bt_anomaly_plot,BTS_plot),5)
+
+
+
+```
+```{r}
+#### Adding other ecodata rows
+### SST anomaly
+sst_temp<-ecodata::bottom_temp
+sst_temp<-sst_temp[(sst_temp$EPU == "GOM")&(sst_temp$Var == "sst anomaly in situ"), ]
+sst_temp<-sst_temp[c(1,3)]
+names(sst_temp)[1] <- "Year"
+names(sst_temp)[2] <- "sstAnomalies"
+
+##make sst line plot
+sst_anomaly_plot<-ggplot(data=sst_temp, aes(x=Year, y=sstAnomalies, group=1)) +
+  geom_line(color="#00608A", size=1.2)+
+  geom_point(color="#00608A", size=1.2)+theme_classic()+
+  theme(axis.line.x.bottom=element_line(size=1.1),axis.line.y.left=element_line(size=1.1),
+        axis.text=element_text(size=12,face="bold"),
+        axis.title=element_text(size=14,face="bold"))+
+  geom_hline(yintercept=0.0,linetype=2)+
+  labs(y="SST Anomaly (°C)")
+
+### GSI
+gsi <- ecodata::gsi %>%
+  dplyr::mutate(Year = Time %>%
+                  stringr::str_trunc(4, "right", "") %>%
+                  as.numeric(),
+                Month = Time %>%
+                  stringr::str_trunc(2, "left", "") %>%
+                  as.numeric(),
+                Month = ifelse(Month == 0.1, 10, Month))
+gsi<-aggregate(Value~Year,data=gsi,FUN="mean")
+names(gsi)[2] <- "GSI"
+
+##make GSI line plot
+GSI_plot<-ggplot(data=gsi, aes(x=Year, y=GSI, group=1)) +
+  geom_line(color="#00608A", size=1.2)+
+  geom_point(color="#00608A", size=1.2)+theme_classic()+
+  theme(axis.line.x.bottom=element_line(size=1.1),axis.line.y.left=element_line(size=1.1),
+        axis.text=element_text(size=12,face="bold"),
+        axis.title=element_text(size=14,face="bold"))+
+  geom_hline(yintercept=0.0,linetype=2)+
+  labs(y="GSI (Δ Degrees Lat)")
+
+
+####Updated Table
+gt_table<-dplyr::tibble(Dataset=c("Bottom Temp Anomaly", "SST Anomaly","Gulf Stream Index","NMFS Bottom Trawl Survey"),
+               Description= c("In situ bottom temperature anomalmy values (1981-2010 reference period)", "In situ sea surface temperature anomalmy values (1981-2010 reference period)","Annual time series of the Gulf Stream Index", "BT trawl survey"),
+               Units= c("°C","°C","Δ Degrees latitude", "Number of fish"),
+               Source= c("ecodata package in R","ecodata package in R", "ecodata package in R","NOAA"),
+               Timeseries= c("","","",""), 
+               Distribution = c(NA,NA,NA,NA)) %>% # Placeholder tibble with NA for map
+  gt() %>% # Turn tibble into gt table
+  text_transform(
+    locations = cells_body(columns = Distribution), # Turn map object into ggplot image
+    fn = function(x){
+      pointsplot %>% ggplot_image(height = px(200))
+    }
+  ) 
+
+  gt_add_plots(gt_table,list(bt_anomaly_plot,sst_anomaly_plot,GSI_plot,BTS_plot),5)
+
+
+
 ```
                
 Current issues 
