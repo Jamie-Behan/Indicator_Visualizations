@@ -83,13 +83,13 @@ st_crs(surveys_sf) <- "EPSG: 4326"
 ```{r plotBathySurvey}
 library(leaflet)
 
-surveys_sf <- head(surveys_sf, n=10)
+# surveys_sf <- head(surveys_sf, n=10)
 # Plot survey points over bathymetry
 pointsplot <- ggplot() +
   geom_contour_filled(data = BathyData, aes(x = lon, y = lat, z = value),
                       breaks = c(0, -50, -100, -200, -300, -400, -500, -5000)) + # Specify custom bathymetric lines to keep
   # geom_point_interactive(data=surveys_sf,aes(tooltip=YEAR)) + 
-  geom_sf(data=surveys_sf, pch='x', col="black", cex=1, alpha=0.5) +
+  geom_sf(data=surveys_sf, pch='x', col="black", cex=1.5, alpha=0.5) +
   #xlim(st_bbox(surveys_sf)[1], st_bbox(surveys_sf)[3]) +
   #ylim(st_bbox(surveys_sf)[2], st_bbox(surveys_sf)[4]) +
   xlab("Longitude") + # Update axis labels
