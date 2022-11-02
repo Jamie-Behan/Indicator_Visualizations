@@ -219,6 +219,13 @@ dplyr::tibble(Dataset=c("Bottom Temp Anomaly", "NMFS Bottom Trawl Survey", "SST"
       pointsplot %>% ggplot_image(height = px(200))
     }
 
+  ) %>% 
+  # Transform long text string to shorter with tooltip
+  text_transform(
+    locations = cells_body(columns = Description, rows = c(1)),
+    fn = function(x){
+      with_tooltip("Bottom temperature anomaly", "In situ bottom temperature anomalmy values (1981-2010 reference period)")
+    }
   )
 
   
