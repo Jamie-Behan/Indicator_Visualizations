@@ -83,13 +83,16 @@ st_crs(surveys_sf) <- "EPSG: 4326"
 ```{r plotBathySurvey}
 library(leaflet)
 
+
 # surveys_sf <- head(surveys_sf, n=10) # Subsets data for testing
 # Plot survey points over bathymetry
 pointsplot <- ggplot() +
   geom_contour_filled(data = BathyData, aes(x = lon, y = lat, z = value),
                       breaks = c(0, -50, -100, -200, -300, -400, -500, -5000)) + # Specify custom bathymetric lines to keep
   # geom_point_interactive(data=surveys_sf,aes(tooltip=YEAR)) + 
+
   geom_sf(data=surveys_sf, pch='x', col="black", cex=2, alpha=0.5) + # Increase point size so visible on small graph
+
   #xlim(st_bbox(surveys_sf)[1], st_bbox(surveys_sf)[3]) +
   #ylim(st_bbox(surveys_sf)[2], st_bbox(surveys_sf)[4]) +
   xlab("Longitude") + # Update axis labels
@@ -183,6 +186,9 @@ To do:
                Source= c("ecodata package in R", "NOAA", "ecodata package in R", "ecodata package in R"),
 
 ```{r}
+yrMean <- survey_data %>% group_by(YEAR) %>% summarise(meanCod = mean(COD_N)) # 
+
+
 library("gt")
 
 ### BT anomaly
@@ -232,12 +238,22 @@ dplyr::tibble(Dataset=c("Bottom Temperature Anomaly", "National Marine Fisheries
   gt_plt_sparkline(Timeseries,fig_dim = c(50,60), same_limit=FALSE) %>%
   gt_plt_dist(Distribution, fig_dim=c(50,60)) %>% # Can't specify certain rows in table (must be before text_transform that adds plot or else it overwrites)
   text_transform(
+
     locations = cells_body(columns = Distribution, rows = c(2)), # Turn map object into ggplot image !!!! will overwrite Distribution plots, to add or remove must change both Distribution list and rows vector here !!!!
+
     fn = function(x){
       pointsplot %>% ggplot_image(height = px(200))
     }
+
   ) %>% 
-  gt_plt_sparkline(Timeseries, fig_dim = c(50,60),label = TRUE,type = "points")
+  # Transform long text string to shorter with tooltip
+  text_transform(
+    locations = cells_body(columns = Description, rows = c(1)),
+    fn = function(x){
+      with_tooltip("Bottom temperature anomaly", "In situ bottom temperature anomalmy values (1981-2010 reference period)")
+    }
+  )
+
   
 ```
 
