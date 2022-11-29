@@ -9,7 +9,7 @@
   
 - "**Indicator_Visualizations_app.R**" - .R that houses code to build and run Shiny app
         
-- "**making_big_ecodata_df.R**" - .R file used to pull relevant data from ecodata package in R, and wrangle data into consistent format to be read in Shiny app
+- "**making_big_ecodata_df.R**" - .R file used to pull relevant data from [ecodata package](https://github.com/NOAA-EDAB/ecodata) in R, and wrangle data into consistent format to be read in Shiny app
     -   *this file will be updated such that data pull processes from ecodata can be streamlined & updated on a regular basis
 
 ### **2. "Data" folder containing environmental data and fisheries stock data used in the shiny app:**
