@@ -21,5 +21,10 @@
 - "**stock_assess_data.csv**" - Other stock data used as an example/placeholder in this app
   -   *these data are subject to change overtime as app is still in progress
 
+### **3. "Table" folder containing code and information regarding table building process for the RStudio 2022 table competition.
 
-      Any further questions can be directed to Jamie Behan: jbehan@gmri.org
+- This table is included in this repository as it uses publicacly available ecosystem indicator data, as used in the app.
+  -   The information in this folder is not necessary to run the app, as it is an adjacent project.
+
+
+#### Any further questions can be directed to Jamie Behan: jbehan@gmri.org
