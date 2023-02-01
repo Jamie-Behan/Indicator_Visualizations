@@ -24,7 +24,7 @@
 
 ### **3. "Table" folder containing code and information regarding table building process for the RStudio 2022 table competition.**
 
-- This table is included in this repository as it uses publicacly available ecosystem indicator data, as used in the app.
+- This table is included in this repository as it uses publicly available ecosystem indicator data, as used in the app.
   -   The information in this folder is not necessary to run the app, as it is an adjacent project.
 
 
