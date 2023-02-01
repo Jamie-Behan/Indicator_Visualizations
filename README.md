@@ -19,8 +19,6 @@
 <br>
 <br>
 <br>
-<br>
-<br>
 
 ### **Included in this Repository is the following:**
 
