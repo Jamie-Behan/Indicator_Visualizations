@@ -3,3 +3,9 @@
 .RData
 .Ruserdata
 .Rproj
+*.pdf
+*.gif
+/papers_writeups
+/Table
+Indicator_Visualizations2.Rproj
+Table_development.Rmd
