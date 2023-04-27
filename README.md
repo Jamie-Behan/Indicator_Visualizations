@@ -22,20 +22,20 @@
 
 ### **Included in this Repository is the following:**
 
-###   **1. "Code" folder containing R code used to build Shiny app:**
+###   **1. "Archived" folder containing R code and data used to build preliminary Shiny app for testing**
+
+###   **1. "Code" folder containing R code used to build current Shiny app:**
 
 | File | Description |
 | ----------- | ----------- |
-|**Indicator_Visualizations_app.R**| .R that houses code to build and run Shiny app|
-|**making_big_ecodata_df.R**| .R file used to pull relevant data from [ecodata package](https://github.com/NOAA-EDAB/ecodata) in R, and wrangle data into consistent format to be read in Shiny app <ul><li>this file will be updated such that data pull processes from ecodata can be streamlined & updated on a regular basis</li>|
+|**sea_grant_app.R**| .R that houses code to build and run Shiny app|
+|**automatic_ecodata.R**| .R file used to pull relevant data from [ecodata package](https://github.com/NOAA-EDAB/ecodata) and other sources in R, and wrangle data into consistent format to be read in Shiny app <ul><li>this file will be updated such that data pull processes from ecodata can be streamlined & updated on a regular basis</li>|
 
 ### **2. "Data" folder containing environmental data and fisheries stock data used in the shiny app:**
 
 | File | Description |
 | ----------- | ----------- |
-|**Plaice_data_dependentvar.xlsx**| American plaice stock data|
-|**big_ecodata.csv**| Environmental data sourced from the ecodata package in R|
-|**stock_assess_data.csv**| Other stock data used as an example/placeholder in this app <ul><li>these data are subject to change overtime as app is still in progress</li>|
+|**stock_assess_data2.csv**| Other stock data used in this app <ul><li>these data are subject to change overtime as app is still in progress</li>|
 
 ### **3. "Table" folder containing code and information regarding table building process for the RStudio 2022 table competition.**
 
