@@ -83,13 +83,16 @@ st_crs(surveys_sf) <- "EPSG: 4326"
 ```{r plotBathySurvey}
 library(leaflet)
 
-surveys_sf <- head(surveys_sf, n=10)
+
+# surveys_sf <- head(surveys_sf, n=10) # Subsets data for testing
 # Plot survey points over bathymetry
 pointsplot <- ggplot() +
   geom_contour_filled(data = BathyData, aes(x = lon, y = lat, z = value),
                       breaks = c(0, -50, -100, -200, -300, -400, -500, -5000)) + # Specify custom bathymetric lines to keep
   # geom_point_interactive(data=surveys_sf,aes(tooltip=YEAR)) + 
-  geom_sf(data=surveys_sf, pch='x', col="black", cex=1, alpha=0.5) +
+
+  geom_sf(data=surveys_sf, pch='x', col="black", cex=2, alpha=0.5) + # Increase point size so visible on small graph
+
   #xlim(st_bbox(surveys_sf)[1], st_bbox(surveys_sf)[3]) +
   #ylim(st_bbox(surveys_sf)[2], st_bbox(surveys_sf)[4]) +
   xlab("Longitude") + # Update axis labels
@@ -170,8 +173,31 @@ df %>%
 
 
 # Current working copy of table!!!!!!
+To do:
+- Finish subsetting data for 1980 onwards
+- pull together documentation for submission
+  - load packages like ecodata OR save our copy as Rdata
+- look at tool tip update from Katie
+- Merge updated documentation:
+
+(Dataset=c("Bottom Temp Anomaly", "NMFS Bottom Trawl Survey", "Sea Surface Temperature Anomalies", "Gulf Stream Index"),
+               Description= c("In situ bottom temperature anomaly values (1981-2010 reference period)", "NMFS Bottom Trawl Survey (1963-2022)", "In situ SST anomaly values (1981-2010 reference period)", "Degrees latitude above the average Gulf Stream position based on ocean temperature at 200 m (15 C) depth between 55°W to 75°W"),
+               Units= c("°C", "Number of fish per/tow", "°C", "Δ Degrees latitude"),
+               Source= c("ecodata package in R", "NOAA", "ecodata package in R", "ecodata package in R"),
+
 ```{r}
+yrMean <- survey_data %>% group_by(YEAR) %>% summarise(meanCod = mean(COD_N)) # 
+
+
 library("gt")
+
+### BT anomaly
+bottom_temp<-ecodata::bottom_temp
+bottom_temp<-bottom_temp[(bottom_temp$EPU == "GOM") & (bottom_temp$Var == "bottom temp anomaly in situ"), ]
+bottom_temp<-bottom_temp[c(1,3)]
+names(bottom_temp)[1] <- "Year"
+names(bottom_temp)[2] <- "Anomalies"
+bt_temp <- bottom_temp %>% filter(Year > 1979)
 
 #### Adding other ecodata rows
 ### SST anomaly
@@ -180,6 +206,7 @@ sst_temp<-sst_temp[(sst_temp$EPU == "GOM")&(sst_temp$Var == "sst anomaly in situ
 sst_temp<-sst_temp[c(1,3)]
 names(sst_temp)[1] <- "Year"
 names(sst_temp)[2] <- "sstAnomalies"
+sst_temp <- sst_temp %>% filter(Year > 1979)
 
 ### GSI
 gsi <- ecodata::gsi %>%
@@ -192,29 +219,41 @@ gsi <- ecodata::gsi %>%
                 Month = ifelse(Month == 0.1, 10, Month))
 gsi<-aggregate(Value~Year,data=gsi,FUN="mean")
 names(gsi)[2] <- "GSI"
+gsi <- gsi %>% filter(Year > 1979) 
 
 ### Annual mean survey #/tow
 BTS_Survey<-data.frame(survey_data[(survey_data$STOCK == "WGOM"), ])
 BTS_Survey<-aggregate(COD_N~YEAR,data=BTS_Survey,FUN ="mean")
 names(BTS_Survey)[2]<-"COD_N"
+BTS_Survey <- BTS_Survey %>% filter(YEAR > 1979)
 
 
-dplyr::tibble(Dataset=c("Bottom Temp Anomaly", "NMFS Bottom Trawl Survey", "SST", "GSI"),
-               Description= c("In situ bottom temperature anomalmy values (1981-2010 reference period)", "BT trawl survey", "SST", "GSI"),
-               Units= c("Degrees C", "Number of fish per tow", "Degrees C", "Change in Degree Latitude"),
-               Source= c("ecodata package in R", "NOAA", "?", "?"),
+dplyr::tibble(Dataset=c("Bottom Temperature Anomaly", "National Marine Fisheries Service (NMFS) Bottom Trawl Survey", "Sea Surface Temperature (SST) Anomalies", "Gulf Stream Index (GSI)"),
+               Description= c("In situ bottom temperature anomaly values (1981-2010 reference period)", "NMFS Bottom Trawl Survey observations for Atlantic cod(1963-2022)", "In situ SST anomaly values (1981-2010 reference period)", "Degrees latitude above the average Gulf Stream position based on ocean temperature at 200 m (15 °C) depth between 55°W to 75°W"),
+               Units= c("°C", "Number of fish per/tow", "°C", "Δ Degrees latitude"),
+               Source= c("ecodata package in R", "National Oceanic and Atmospheric Adminsitration (NOAA)", "ecodata package in R", "ecodata package in R"),
                Timeseries= list(c(bottom_temp$Anomalies), c(BTS_Survey$COD_N), c(sst_temp$sstAnomalies), c(gsi$GSI)), 
               Distribution = list(bottom_temp$Anomalies,NA,sst_temp$sstAnomalies,gsi$GSI)) %>% # Placeholder tibble with NA for map
   gt() %>% # Turn tibble into gt table
   gt_plt_sparkline(Timeseries,fig_dim = c(50,60), same_limit=FALSE) %>%
   gt_plt_dist(Distribution, fig_dim=c(50,60)) %>% # Can't specify certain rows in table (must be before text_transform that adds plot or else it overwrites)
   text_transform(
-    locations = cells_body(columns = Distribution, rows = c(2)), # Turn map object into ggplot image
+
+    locations = cells_body(columns = Distribution, rows = c(2)), # Turn map object into ggplot image !!!! will overwrite Distribution plots, to add or remove must change both Distribution list and rows vector here !!!!
+
     fn = function(x){
       pointsplot %>% ggplot_image(height = px(200))
     }
+
   ) %>% 
-  gt_plt_sparkline(Timeseries, fig_dim = c(50,60),label = TRUE,type = "points")
+  # Transform long text string to shorter with tooltip
+  text_transform(
+    locations = cells_body(columns = Description, rows = c(1)),
+    fn = function(x){
+      with_tooltip("Bottom temperature anomaly", "In situ bottom temperature anomalmy values (1981-2010 reference period)")
+    }
+  )
+
   
 ```
 
