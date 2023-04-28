@@ -4,7 +4,6 @@
 .Ruserdata
 .Rproj
 *.pdf
-*.gif
 /papers_writeups
 /Table
 Indicator_Visualizations2.Rproj
