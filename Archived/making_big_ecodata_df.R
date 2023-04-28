@@ -1,4 +1,3 @@
-<<<<<<< HEAD:Archived/making_big_ecodata_df.R
 library(ecodata)
 ecodata::nefs
 test1<-as.data.frame(ecodata::nefsc_survey)
@@ -122,8 +121,7 @@ temperature_ecodata<-merge(temperature_ecodata,slopewater_all,by="Time",all=T)
 
 big_ecodata<-temperature_ecodata
 write.csv(big_ecodata,"C:/Users/jbehan/Box/Jamie Behan/GMRI/Openscapes/Indicator_visualizations/big_ecodata.csv", row.names = FALSE)  
-  
-=======
+
 library(ecodata)
 ecodata::nefs
 test1<-as.data.frame(ecodata::nefsc_survey)
@@ -247,5 +245,3 @@ temperature_ecodata<-merge(temperature_ecodata,slopewater_all,by="Time",all=T)
 
 big_ecodata<-temperature_ecodata
 write.csv(big_ecodata,"C:/Users/jbehan/Box/Jamie Behan/GMRI/Openscapes/Indicator_visualizations/big_ecodata.csv", row.names = FALSE)  
-  
->>>>>>> 0ea69a5afffce8fd03ce138fb9bac624df60808f:Code/making_big_ecodata_df.R
