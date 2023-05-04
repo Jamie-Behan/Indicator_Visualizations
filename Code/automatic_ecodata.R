@@ -49,15 +49,7 @@ other_df<-other_df[other_df$Var == 'Annual Forage Fish Biomass Estimate'& other_
 other_df<-other_df[,c(-5)]
 other_df$Var <- paste0("Annual_Forage_Fish_Biomass")
 ecodata_df<-rbind(ecodata_df,other_df)
-#### Heatwave (Surface and bottom) dataset ####     (excluding heatwave data because newest de-trended data is basically all 0s for GOM region)
-#other_df<-as.data.frame(ecodata::heatwave)
-#other_df<-other_df[other_df$Var == 'cumulative intensity-SurfaceDetrended
-#'| other_df$Var == 'maximum intensity-SurfaceDetrended'| 
-#other_df$Var == 'cumulative intensity-BottomDetrended'| other_df$Var == 'maximum intensity-BottomDetrended',]
-#other_df<-other_df[,c(-5)]
-#other_df$Var <-gsub(" ", "_", other_df$Var)
-#other_df$Var <-gsub("-", "_", other_df$Var)
-#ecodata_df<-rbind(ecodata_df,other_df)
+
 #####hudson river flow dataset#### 
 other_df<-as.data.frame(ecodata::hudson_river_flow)
 other_df$Var <- paste0("Hudson_River_Flow_Rate")
