@@ -8,12 +8,11 @@ metadata <-tabItem(tabName = "Metadata",
         box(
           accordion(
             id = "accordion1",
-            class = "accordion1",  # Add a class for targeting
             accordionItem(
               title = "Annual AMO:",
               status = "primary",
-              "AMO (Atlantic Multidecadal Oscillation) Index. These data represent annual means of the NOAA Physical Sciences Laboratory's unsmoothed short monthly AMO dataset found at https://psl.noaa.gov/data/timeseries/AMO/. 1948-present.These data represent the weighted average over the N Atlantic from 0 to 70N, and have been detrended."
-            ),
+              "AMO (Atlantic Multidecadal Oscillation) Index. These data represent annual means of the NOAA Physical Sciences Laboratory's unsmoothed short monthly AMO dataset found at https://psl.noaa.gov/data/timeseries/AMO/. 1948-present. These data represent the weighted average over the N Atlantic from 0 to 70N, and have been detrended."
+              ),
             accordionItem(
               title = "In-situ Bottom Temperature Anomaly (NEFSC)",
               status = "primary",
