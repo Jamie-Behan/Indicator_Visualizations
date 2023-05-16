@@ -6,23 +6,17 @@ here()
 #### SOURCE "automatic_ecodata.R"
 source(here("Code/automatic_ecodata.R"))
 big_ecodata<-lapply(ecodata_df,as.numeric)
-####load ecodata that has been combined into one big df from "making_big_ecodata_df.R"#####
-stock_assess_data<-read.csv(here("Data/stock_assess_data2.csv"))
-stock_assess_data<-replace(stock_assess_data,stock_assess_data=='',NA)
-stock_assess_data<-sapply(stock_assess_data,as.character)
-stock_assess_data<- as.data.frame(gsub(",","",stock_assess_data))
-stock_assess_data<-lapply(stock_assess_data,as.numeric)
-
+####load ecodata that has been combined into one big df from "making_big_ecodata_df.R"####
+###load stock data, handle empty strings, remove commas, and convert the data to numeric
+stock_assess_data <- lapply(as.data.frame(lapply(read.csv(here("Data/stock_assess_data2.csv")), function(x) ifelse(x == '', NA, gsub(",", "", as.character(x))))), as.numeric)
 ##Merge all dfs
 Both <- list(big_ecodata, stock_assess_data)
 Both <-Reduce(function(x, y) merge(x, y, by="Year",all=T), Both)
 
 uniquecolnames <- unique(gsub("_[^_]+$", "", names(Both)[-1])) #get unique column names excluding year
 
-Both2<-as.data.frame(big_ecodata)
-Both2<-Both2[ , order(names(Both2))]
-Both2 <- list(Both[1],Both2, stock_assess_data)
-Both2 <-Reduce(function(x, y) merge(x, y, by="Year",all=T), Both2)
+Both2 <- Reduce(function(x, y) merge(x, y, by = "Year", all = TRUE),
+                list(Both[1], as.data.frame(big_ecodata)[, order(names(big_ecodata))], stock_assess_data))
 
 ###### tweaks, a list object to set up multicols for checkboxGroupInput#####
 tweaks <- 
@@ -38,32 +32,26 @@ tweaks <-
                                  ")) 
   ))
 ##### data control: the checkboxes will control the data values plotted ######
-controls <-
+# Function to generate controls with or without the year column
+generate_controls <- function(include_year = FALSE) {
+  choice_names <- if (include_year) gsub("_", " ", colnames(Both2[1:17])) else sort(gsub("_", " ", uniquecolnames[1:16]),decreasing = FALSE)
+  choice_values <- if (include_year) colnames(Both2[1:17]) else sort(colnames(Both[2:17]), decreasing = FALSE)
+  
   list(h3("Select Environmental Variables"), 
        tags$div(align = 'left', 
                 class = 'multicol', 
                 checkboxGroupInput("variable", 
                                    label = NULL, 
-                                   choiceNames  = sort(gsub("_", " ", uniquecolnames[1:16]),decreasing = FALSE), ##replace_with space and select columns on env data only
-                                   
-                                   choiceValues = sort(colnames(Both[2:17]),decreasing = FALSE),  ##select columns on env data only
-                                   selected = c("Bottom_Temp_Anomaly_GOM",multiple = TRUE)) 
-                
-       )#close tags$div
-  )#close list 
-##### controls2: year column included######
-controls2 <-
-  list(h3("Select Environmental Variables"), 
-       tags$div(align = 'left', 
-                class = 'multicol', 
-                checkboxGroupInput("show_vars", 
-                                   label = NULL, 
-                                   choiceNames  = gsub("_", " ", colnames(Both2[1:17])), ##select columns on env data only
-                                   
-                                   choiceValues = colnames(Both2[1:17]), ##select columns on env data only 
-                                   selected = c("Year","Bottom_Temp_Anomaly_GOM",multiple = TRUE))
-       )#close tags$div
-  )#close list 
+                                   choiceNames = choice_names,
+                                   choiceValues = choice_values,
+                                   selected = if (include_year) c("Year", "Bottom_Temp_Anomaly_GOM") else "Bottom_Temp_Anomaly_GOM")
+       )
+  )
+}
+
+controls <- generate_controls(include_year = FALSE)  # Generate controls without the year column
+controls2 <- generate_controls(include_year = TRUE)  # Generate controls with the year column
+
 ###### finding name of second longest column (excluding NAs)
 second_col<- function (df){
   m1 = sapply(df, function(x) sum(!is.na(x))) #find length of each column
@@ -85,12 +73,10 @@ sidebar <- dashboardSidebar(width = 150,
 )
 ######## define colors#####
 gmri_colors<-tags$head(tags$style(HTML('
-
         /* main sidebar */
         .skin-blue .main-sidebar {
                               background-color: #00608A;
                               }
-
         /* active selected tab in the sidebarmenu */
         .skin-blue .main-sidebar .sidebar .sidebar-menu .active a{
                               background-color: #00736D;
@@ -99,217 +85,222 @@ gmri_colors<-tags$head(tags$style(HTML('
                                 .content-wrapper, .right-side {
                                 background-color: #E9E9E9;
                                 }
-
-
                               ')))
 ##########################
-
 ###### Define UI ######
 ui <- dashboardPage(
-  dashboardHeader(title= span("Visualizing Environmental Indicators in the Gulf of Maine", style = "color: #E9E9E9; font-size:34px;font-weight: bold;font-family: Arial"),titleWidth = 550,
-                  
-                  tags$li(a(href = 'https://www.gmri.org/',
-                            img(src = "https://github.com/gulfofmaine/gmRi/blob/master/inst/stylesheets/gmri_logo.png?raw=true",
-                                title = "gmri.org", height = "80px"),
-                            style = "padding-top:10px; padding-bottom:10px;"),
-                          class = "dropdown",
-                          tags$style(".main-header {max-height: 100px}"),
-                          tags$style(".main-header .logo {height: 100px}"))
+  dashboardHeader(
+    title = span("Visualizing Environmental Indicators in the Gulf of Maine", 
+                 style = "color: #E9E9E9; font-size:34px;font-weight: bold;font-family: Arial"),
+    titleWidth = 550,
+    tags$li(
+      a(href = 'https://www.gmri.org/',
+        img(src = "https://github.com/gulfofmaine/gmRi/blob/master/inst/stylesheets/gmri_logo.png?raw=true",
+            title = "gmri.org", height = "80px"),
+        style = "padding-top:10px; padding-bottom:10px;"
+      ),
+      class = "dropdown",
+      tags$style(".main-header {max-height: 100px}"),
+      tags$style(".main-header .logo {height: 100px}")
+    )
   ),
   sidebar,
-  dashboardBody(gmri_colors,
-                fluidPage(tweaks,
-                          tabItems(
-                            
-                            tabItem(tabName = "Plots",
-                                    h2("Choose Variables & Plot (up to 5 Total)"),
-                                    sidebarPanel(controls,
-                                                 
-                                                 h3("Select Species and Stock Variables"),width=12,
-                                                 selectInput("plotSpecies", "plotSpecies", choices = c("Striped Bass"="Striped_Bass")),
-                                                 uiOutput("Stockdata_selector")),# from objects created in server
-                                    
-                                    # Input: Select plotting style ----
-                                    radioButtons("Plotting_Style", "Select Plotting Style",
-                                                 choices = c("Layered" = "Layered","Stacked" = "Stacked"),
-                                                 selected = 'Layered'),
-                                    mainPanel(width = 12,
-                                              tabsetPanel(type = "tabs",
-                                                          tabPanel("Plot", plotlyOutput('plot'))
-                                              )# Tabsetpanel
-                                    ) #main panel
-                            ), #tabItem
-                            
-                            tabItem(tabName = "Data",
-                                    h2("View Data Tables"),
-                                    sidebarPanel(controls2,
-                                                 
-                                                 h3("Select Species and Stock Variables"),width=12,
-                                                 selectInput("Species", "Species", choices = c("Striped Bass"="Striped_Bass")),
-                                                 uiOutput("Stockdata_selector2")),
-                                    
-                                    hr(style = "border-top: 1px solid #000000;"),
-                                    mainPanel(width = 12,
-                                              tabsetPanel(id = 'dataset',
-                                                          tabPanel("Data", DT::dataTableOutput("mytable1"))))
-                            ),
-                            
-                            #####Metadata#####
-                            tabItem(tabName = "Metadata",
-                                    h2("Metadata"),
-                                    
-                                    box( 
-                                      accordion(
-                                        id = "accordion1",
-                                        accordionItem(
-                                          title = "Annual AMO:",
-                                          status = "primary",
-                                          collapsed = FALSE,
-                                          "AMO (Atlantic Multidecadal Oscillation) Index. These data represent annual means of the NOAA Physical Sciences Laboratory's unsmoothed short monthly AMO dataset found at https://psl.noaa.gov/data/timeseries/AMO/. 1948-present.These data represent the weighted average over the N Atlantic from 0 to 70N, and have been detrended."
-                                        ),
-                                        accordionItem(
-                                          title = "In-situ Bottom Temperature Anomaly (NEFSC)",
-                                          status = "primary",
-                                          collapsed = FALSE,
-                                          "Annual bottom temperature anomalies for the GOM region. Bottom Temperature data collected from NEFSC survey from 1977-present. 
+  dashboardBody(
+    gmri_colors,
+    fluidPage(
+      tweaks,
+      tabItems(
+        tabItem(
+          tabName = "Plots",
+          h2("Choose Variables & Plot (up to 5 Total)"),
+          sidebarPanel(
+            controls,
+            h3("Select Species and Stock Variables"),
+            width = 12,
+            selectInput("plotSpecies", "plotSpecies", choices = c("Striped Bass" = "Striped_Bass")),
+            uiOutput("Stockdata_selector")
+          ),
+          radioButtons("Plotting_Style", "Select Plotting Style",
+                       choices = c("Layered" = "Layered", "Stacked" = "Stacked"),
+                       selected = "Layered"),
+          mainPanel(
+            width = 12,
+            tabsetPanel(
+              type = "tabs",
+              tabPanel("Plot", plotlyOutput("plot"))
+            )
+          )
+        ),
+        tabItem(
+          tabName = "Data",
+          h2("View Data Tables"),
+          sidebarPanel(
+            controls2,
+            h3("Select Species and Stock Variables"),
+            width = 12,
+            selectInput("Species", "Species", choices = c("Striped Bass" = "Striped_Bass")),
+            uiOutput("Stockdata_selector2")
+          )),
+          #####Metadata#####
+          tabItem(tabName = "Metadata",
+                  h2("Metadata"),
+                  
+                  box( 
+                    accordion(
+                      id = "accordion1",
+                      accordionItem(
+                        title = "Annual AMO:",
+                        status = "primary",
+                        collapsed = FALSE,
+                        "AMO (Atlantic Multidecadal Oscillation) Index. These data represent annual means of the NOAA Physical Sciences Laboratory's unsmoothed short monthly AMO dataset found at https://psl.noaa.gov/data/timeseries/AMO/. 1948-present.These data represent the weighted average over the N Atlantic from 0 to 70N, and have been detrended."
+                      ),
+                      accordionItem(
+                        title = "In-situ Bottom Temperature Anomaly (NEFSC)",
+                        status = "primary",
+                        collapsed = FALSE,
+                        "Annual bottom temperature anomalies for the GOM region. Bottom Temperature data collected from NEFSC survey from 1977-present. 
                                           In ℃.Data are sourced from the R package 'ecodata'. See https://noaa-edab.github.io/tech-doc/ for more info."
-                                        ),
-                                        accordionItem(
-                                          title = "Bottom Temperature Anomaly (GLORYS)",
-                                          status = "primary",
-                                          collapsed = FALSE,
-                                          "GLORYS12V1 daily bottom temperature product anomalies for the GOM region. Annual means from 1993-2018. 
+                      ),
+                      accordionItem(
+                        title = "Bottom Temperature Anomaly (GLORYS)",
+                        status = "primary",
+                        collapsed = FALSE,
+                        "GLORYS12V1 daily bottom temperature product anomalies for the GOM region. Annual means from 1993-2018. 
                                           1994-2010 climatology was used as anomaly period. In ℃.Data are sourced from the R package 'ecodata'. 
                                           See https://noaa-edab.github.io/tech-doc/ for more info."
-                                        ),
-                                        accordionItem(
-                                          title = "Calanus Abundance Anomaly",
-                                          status = "primary",
-                                          collapsed = FALSE,
-                                          "Calanus finmarchicus abundance anomalies for the GOM region. Data are sourced from the R package 'ecodata'. See https://noaa-edab.github.io/tech-doc/ for more info. "
-                                        ),
-                                        accordionItem(
-                                          title = "Large Copepod Abundance Anomalies",
-                                          status = "primary",
-                                          collapsed = FALSE,
-                                          "Large copepod abundance anomalies for the GOM region. Data are sourced from the R package 'ecodata'. See https://noaa-edab.github.io/tech-doc/ for more info."
-                                        ),
-                                        accordionItem(
-                                          title = "Small Copepod Abundance Anomalies",
-                                          status = "primary",
-                                          collapsed = FALSE,
-                                          "Small copepod abundance anomalies for the GOM region. Abundance anomalies estimated by averaging the individual abundance anomalies of Pseudocalanus spp., 
+                      ),
+                      accordionItem(
+                        title = "Calanus Abundance Anomaly",
+                        status = "primary",
+                        collapsed = FALSE,
+                        "Calanus finmarchicus abundance anomalies for the GOM region. Data are sourced from the R package 'ecodata'. See https://noaa-edab.github.io/tech-doc/ for more info. "
+                      ),
+                      accordionItem(
+                        title = "Large Copepod Abundance Anomalies",
+                        status = "primary",
+                        collapsed = FALSE,
+                        "Large copepod abundance anomalies for the GOM region. Data are sourced from the R package 'ecodata'. See https://noaa-edab.github.io/tech-doc/ for more info."
+                      ),
+                      accordionItem(
+                        title = "Small Copepod Abundance Anomalies",
+                        status = "primary",
+                        collapsed = FALSE,
+                        "Small copepod abundance anomalies for the GOM region. Abundance anomalies estimated by averaging the individual abundance anomalies of Pseudocalanus spp., 
                                           Centropages hamatus, Centropages typicus, and Temora longicornis. Data are sourced from the R package 'ecodata'. 
                                           See https://noaa-edab.github.io/tech-doc/ for more info."
-                                        ),
-                                        accordionItem(
-                                          title = "GSI",
-                                          status = "primary",
-                                          collapsed = FALSE,
-                                          "Annual time series of the Gulf Stream Index. Positive values are a more northerly Gulf Stream, and Negative values are a more southerly Gulf Stream. Anomalies of latitudinal position. 1954-present.
+                      ),
+                      accordionItem(
+                        title = "GSI",
+                        status = "primary",
+                        collapsed = FALSE,
+                        "Annual time series of the Gulf Stream Index. Positive values are a more northerly Gulf Stream, and Negative values are a more southerly Gulf Stream. Anomalies of latitudinal position. 1954-present.
                                           Data are sourced from the R package 'ecodata'. See https://noaa-edab.github.io/tech-doc/ for more info."
-                                        ),
-                                        accordionItem(
-                                          title = "Hudson River Flow Rate (cubic meters per second)",
-                                          status = "primary",
-                                          collapsed = FALSE,
-                                          "Mean annual flow of the Hudson River in cubic meters per second at the USGS gauge 01358000 at Green Island, New York.
+                      ),
+                      accordionItem(
+                        title = "Hudson River Flow Rate (cubic meters per second)",
+                        status = "primary",
+                        collapsed = FALSE,
+                        "Mean annual flow of the Hudson River in cubic meters per second at the USGS gauge 01358000 at Green Island, New York.
                                           Data are sourced from the R package 'ecodata'. See https://noaa-edab.github.io/tech-doc/ for more info."
-                                        ),
-                                        accordionItem(
-                                          title = "NAO",
-                                          status = "primary",
-                                          collapsed = FALSE,
-                                          "North Atlantic Oscillation (NAO). Unit-less. 1864-present. Data are sourced from the R package 'ecodata'. 
+                      ),
+                      accordionItem(
+                        title = "NAO",
+                        status = "primary",
+                        collapsed = FALSE,
+                        "North Atlantic Oscillation (NAO). Unit-less. 1864-present. Data are sourced from the R package 'ecodata'. 
                                           See https://noaa-edab.github.io/tech-doc/ for more info."
-                                        ),
-                                        accordionItem(
-                                          title = "OISST Anomaly (Season)",
-                                          status = "primary",
-                                          collapsed = FALSE,
-                                          "SST anomalies for the GOM region for either the winter, spring, summer, or fall season. These data were derived from the NOAA Optimum Interpolation SST High Resolution data set (NOAA OISST V2). 
+                      ),
+                      accordionItem(
+                        title = "OISST Anomaly (Season)",
+                        status = "primary",
+                        collapsed = FALSE,
+                        "SST anomalies for the GOM region for either the winter, spring, summer, or fall season. These data were derived from the NOAA Optimum Interpolation SST High Resolution data set (NOAA OISST V2). 
                                           The 1982-2020 climatology was used to calculate anomalies.1982-present. In ℃.  Data are sourced from the R package 'ecodata'. 
                                           See https://noaa-edab.github.io/tech-doc/ for more info."
-                                        ),
-                                        accordionItem(
-                                          title = "In-situ SST Anomaly (NEFSC)",
-                                          status = "primary",
-                                          collapsed = FALSE,
-                                          "Annual SST anomalies for the GOM region. SST data collected from NEFSC survey from 1977-present. 
+                      ),
+                      accordionItem(
+                        title = "In-situ SST Anomaly (NEFSC)",
+                        status = "primary",
+                        collapsed = FALSE,
+                        "Annual SST anomalies for the GOM region. SST data collected from NEFSC survey from 1977-present. 
                                           In ℃. Data are sourced from the R package 'ecodata'. See https://noaa-edab.github.io/tech-doc/ for more info."
-                                        )
-
-                                      ),#accordion
-                                      title = "Environmental Data", footer = NULL, status = "success",
-                                      solidHeader = FALSE, background = NULL, width = 12, height = NULL,
-                                      collapsible = TRUE, collapsed = TRUE)#box
-                                    ,
-                                    
-                                    box(  
-                                      #####Striped Bass accordion#####
-                                      accordion(
-                                        id = "accordion2",
-                                        accordionItem(
-                                          title = "Striped Bass (Morone saxatilis):",
-                                          status = "success",
-                                          collapsed = TRUE,
-                                          accordionItem(
-                                            title = "Commercial Landings (mt):",
-                                            status = "primary",
-                                            collapsed = FALSE,
-                                            "Striped Bass commercial landings in metric tons. 1947-2017. Data were sourced from the 2018 Benchmark Stock Assessment (SAW 66)"
-                                          ),
-                                          accordionItem(
-                                            title = "Recreational Landings (mt):",
-                                            status = "primary",
-                                            collapsed = FALSE,
-                                            "Striped Bass recreational landings in metric tons. 1982-2017. Data were sourced from the 2018 Benchmark Stock Assessment (SAW 66)"
-                                          ),
-                                          accordionItem(
-                                            title = "Maine Recreational Harvest (numbers of fish/Year):",
-                                            status = "primary",
-                                            collapsed = FALSE,
-                                            "Striped Bass annual recreational landings for the state of Maine (numbers of fish). 1982-2017. Data were sourced from the 2018 Benchmark Stock Assessment (SAW 66)"
-                                          ),
-                                          accordionItem(
-                                            title = "Age 1 Population Abundance:",
-                                            status = "primary",
-                                            collapsed = FALSE,
-                                            "Estimates of age-specific (age 1) population abundance, 1982-2021. These data were sourced from the 2022 Atlantic Striped Bass Stock Assessment Update Appendices."
-                                          ),
-                                          accordionItem(
-                                            title = "Total Population Abundance:",
-                                            status = "primary",
-                                            collapsed = FALSE,
-                                            "Estimates of age-specific (ages 1-15+) population abundance, 1982-2021. These data were sourced from the 2022 Atlantic Striped Bass Stock Assessment Update Appendices."
-                                          ),
-                                          accordionItem(
-                                            title = "Weight at Age 1 (kg):",
-                                            status = "primary",
-                                            collapsed = FALSE,
-                                            "Striped Bass mean weight at age 1 (WAA) in kilograms. 1982-2017. Data were sourced from the 2018 Benchmark Stock Assessment (SAW 66)"
-                                          ),
-                                          accordionItem(
-                                            title = "Weight at Age 4 (kg):",
-                                            status = "primary",
-                                            collapsed = FALSE,
-                                            "Striped Bass mean weight at age 4 (WAA) in kilograms. 1982-2017. Data were sourced from the 2018 Benchmark Stock Assessment (SAW 66)"
-                                          )
-                                        )
-),
-                                      #############
-                                      title = "Stock Data", footer = NULL, status = "success",
-                                      solidHeader = FALSE, background = NULL, width = 12, height = NULL,
-                                      collapsible = TRUE, collapsed = TRUE)#box
-                            )#tabitem
-                          )#tabitems
-                          
-                          ############  
-                )#fluidpage
-  )#dasboardbody
-) # dashboard page
-
-
+                      )
+                      
+                    ),#accordion
+                    title = "Environmental Data", footer = NULL, status = "success",
+                    solidHeader = FALSE, background = NULL, width = 12, height = NULL,
+                    collapsible = TRUE, collapsed = TRUE)#box
+                  ,
+                  
+                  box(  
+                    #####Striped Bass accordion#####
+                    accordion(
+                      id = "accordion2",
+                      accordionItem(
+                        title = "Striped Bass (Morone saxatilis):",
+                        status = "success",
+                        collapsed = TRUE,
+                        accordionItem(
+                          title = "Commercial Landings (mt):",
+                          status = "primary",
+                          collapsed = FALSE,
+                          "Striped Bass commercial landings in metric tons. 1947-2017. Data were sourced from the 2018 Benchmark Stock Assessment (SAW 66)"
+                        ),
+                        accordionItem(
+                          title = "Recreational Landings (mt):",
+                          status = "primary",
+                          collapsed = FALSE,
+                          "Striped Bass recreational landings in metric tons. 1982-2017. Data were sourced from the 2018 Benchmark Stock Assessment (SAW 66)"
+                        ),
+                        accordionItem(
+                          title = "Maine Recreational Harvest (numbers of fish/Year):",
+                          status = "primary",
+                          collapsed = FALSE,
+                          "Striped Bass annual recreational landings for the state of Maine (numbers of fish). 1982-2017. Data were sourced from the 2018 Benchmark Stock Assessment (SAW 66)"
+                        ),
+                        accordionItem(
+                          title = "Age 1 Population Abundance:",
+                          status = "primary",
+                          collapsed = FALSE,
+                          "Estimates of age-specific (age 1) population abundance, 1982-2021. These data were sourced from the 2022 Atlantic Striped Bass Stock Assessment Update Appendices."
+                        ),
+                        accordionItem(
+                          title = "Total Population Abundance:",
+                          status = "primary",
+                          collapsed = FALSE,
+                          "Estimates of age-specific (ages 1-15+) population abundance, 1982-2021. These data were sourced from the 2022 Atlantic Striped Bass Stock Assessment Update Appendices."
+                        ),
+                        accordionItem(
+                          title = "Weight at Age 1 (kg):",
+                          status = "primary",
+                          collapsed = FALSE,
+                          "Striped Bass mean weight at age 1 (WAA) in kilograms. 1982-2017. Data were sourced from the 2018 Benchmark Stock Assessment (SAW 66)"
+                        ),
+                        accordionItem(
+                          title = "Weight at Age 4 (kg):",
+                          status = "primary",
+                          collapsed = FALSE,
+                          "Striped Bass mean weight at age 4 (WAA) in kilograms. 1982-2017. Data were sourced from the 2018 Benchmark Stock Assessment (SAW 66)"
+                        )
+                      )
+                    ),
+                    #############
+                    title = "Stock Data", footer = NULL, status = "success",
+                    solidHeader = FALSE, background = NULL, width = 12, height = NULL,
+                    collapsible = TRUE, collapsed = TRUE)#box
+          )#tabitem
+        ),#tabitems
+          hr(style = "border-top: 1px solid #000000;"),
+          mainPanel(
+            width = 12,
+            tabsetPanel(
+              id = "dataset",
+              tabPanel("Data", DT::dataTableOutput("mytable1"))
+            )
+          )
+        )
+      )
+    )#close dashboardpage
 ###### Define server function  ######
 server <- function(input, output,session) {
   dataDf <- reactive({
