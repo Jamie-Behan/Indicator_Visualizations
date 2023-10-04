@@ -32,6 +32,11 @@ metadata <-tabItem(tabName = "Metadata",
               "Calanus finmarchicus abundance anomalies for the GOM region. Data are sourced from the R package 'ecodata'. See https://noaa-edab.github.io/tech-doc/ for more info. "
             ),
             accordionItem(
+              title = "Median Cholorphyll A",
+              status = "primary",
+              "time series of remotely sensed chlorophyll a (CHL) from the Northeast Continental Shelf region. Data are from multiple sensors (OC-CCI, SeaWiFS, MODIS-Aqua) and sourced from the R package 'ecodata'. See https://noaa-edab.github.io/tech-doc/ for more info. "
+              ),
+            accordionItem(
               title = "Large Copepod Abundance Anomalies",
               status = "primary",
               "Large copepod abundance anomalies for the GOM region. Data are sourced from the R package 'ecodata'. See https://noaa-edab.github.io/tech-doc/ for more info."
