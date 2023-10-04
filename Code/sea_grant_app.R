@@ -12,18 +12,18 @@ stock_assess_data<-replace(stock_assess_data,stock_assess_data=='',NA)
 stock_assess_data<-sapply(stock_assess_data,as.character)
 stock_assess_data<- as.data.frame(gsub(",","",stock_assess_data))
 stock_assess_data<-lapply(stock_assess_data,as.numeric)
-#plaice_data<-read_excel(here("Data/Plaice_data_dependentvar.xlsx"))
+####load salinity data from GLORYs####
+salinity_data<-read.csv(here("Data/GLORYs_salinity/mean_salinity_GLORYs.csv"))
 ##Merge all dfs
-Both <- list(big_ecodata, stock_assess_data)
+Both <- list(big_ecodata, salinity_data,stock_assess_data)
 Both <-Reduce(function(x, y) merge(x, y, by="Year",all=T), Both)
 Both <-Both[rowSums(is.na(Both)) != ncol(Both), ] #removes rows containing all NAs
 
 uniquecolnames <- unique(gsub("_[^_]+$", "", names(Both)[-1])) #get unique column names excluding year
-#uniquecolnamesYEAR <- unique(gsub("_[^_]+$", "", names(Both))) #get unique column names including year
 
 Both2<-as.data.frame(big_ecodata)
 Both2<-Both2[ , order(names(Both2))]
-Both2 <- list(Both[1],Both2, stock_assess_data)
+Both2 <- list(Both[1],Both2,salinity_data, stock_assess_data)
 Both2 <-Reduce(function(x, y) merge(x, y, by="Year",all=T), Both2)
 Both2 <-Both2[rowSums(is.na(Both2)) != ncol(Both2), ] #removes rows containing all NAs
 
@@ -47,9 +47,9 @@ controls <-
                 class = 'multicol', 
                 checkboxGroupInput("variable", 
                                    label = NULL, 
-                                   choiceNames  = sort(gsub("_", " ", uniquecolnames[1:17]),decreasing = FALSE), ##replace_with space and select columns on env data only
+                                   choiceNames  = sort(gsub("_", " ", uniquecolnames[1:18]),decreasing = FALSE), ##replace_with space and select columns on env data only
                                    
-                                   choiceValues = sort(colnames(Both[2:18]),decreasing = FALSE),  ##select columns on env data only
+                                   choiceValues = sort(colnames(Both[2:19]),decreasing = FALSE),  ##select columns on env data only
                                    selected = c("Bottom_Temp_Anomaly_GOM",multiple = TRUE)) 
                 
        )#close tags$div
@@ -61,9 +61,9 @@ controls2 <-
                 class = 'multicol', 
                 checkboxGroupInput("show_vars", 
                                    label = NULL, 
-                                   choiceNames  = gsub("_", " ", colnames(Both2[1:18])), ##select columns on env data only
+                                   choiceNames  = gsub("_", " ", colnames(Both2[1:19])), ##select columns on env data only
                                    
-                                   choiceValues = colnames(Both2[1:18]), ##select columns on env data only 
+                                   choiceValues = colnames(Both2[1:19]), ##select columns on env data only 
                                    selected = c("Year","Bottom_Temp_Anomaly_GOM",multiple = TRUE))
        )#close tags$div
   )#close list 
@@ -81,50 +81,130 @@ second_col<- function (df){
 sidebar <- dashboardSidebar(width = 150,
                             tags$style(".left-side, .main-sidebar {padding-top: 100px}"),
                             sidebarMenu(
+                              menuItem("Home", tabName = "Home", icon = icon("house")),
                               menuItem("Plots", tabName = "Plots", icon = icon("chart-line")),
                               menuItem("Data", tabName = "Data",icon = icon("table")),
                               menuItem("Metadata", tabName = "Metadata",icon = icon("list"))
-                            )
+                              
+                            ),
+                            HTML(paste0(
+                              "<div style='margin-top: 100px; text-align: center;'>",
+                              "<a href='https://github.com/Jamie-Behan' target='_blank'>", 
+                              icon("github", class = "fa-3x"), 
+                              "<br/>Jamie Behan 2023",
+                              "</a>",
+                              "</div>"
+                            ))
 )
 ######## define colors#####
 gmri_colors<-tags$head(tags$style(HTML('
         /* main sidebar */
         .skin-blue .main-sidebar {
-                              background-color: #00608A;
-                              }
+        background-color: #00608A;
+        }
         /* active selected tab in the sidebarmenu */
         .skin-blue .main-sidebar .sidebar .sidebar-menu .active a{
-                              background-color: #00736D;
+        background-color: #00736D;
         }
-                              /* body */
-                                .content-wrapper, .right-side {
-                                background-color: #E9E9E9;
-                                }
-                              ')))
+        /* body */
+        .content-wrapper, .right-side {
+        background-color: #E9E9E9;
+        }
+        ')))
 ##########################
 ###### Define UI ######
 ui <- dashboardPage(
   dashboardHeader(
     title = span("Visualizing Environmental Indicators in the Gulf of Maine", 
-                 style = "color: #E9E9E9; font-size:34px;font-weight: bold;font-family: Arial"),
-    titleWidth = 550,
+                 style = "color: #E9E9E9; font-size: 28px; font-weight: bold; font-family: Arial"),
+    titleWidth = 540,
     tags$li(
-      a(href = 'https://www.gmri.org/',
-        img(src = "https://github.com/gulfofmaine/gmRi/blob/master/inst/stylesheets/gmri_logo.png?raw=true",
-            title = "gmri.org", height = "80px"),
-        style = "padding-top:10px; padding-bottom:10px;"
+      div(
+        style = "display: flex; align-items: center;",
+        a(href = 'https://umaine.edu/marine/',
+          img(src = "https://i.pinimg.com/originals/a6/56/72/a656729123a2857f93010c5a9aa70c0d.png",
+              title = "Umaine School of Marine Science", height = "80px"),
+          style = "padding-top: 10px; padding-bottom: 10px;"
+        ),
+        style = "display: flex; align-items: center;",
+        a(href = 'https://www.gmri.org/',
+          img(src = "https://github.com/gulfofmaine/gmRi/blob/master/inst/stylesheets/gmri_logo.png?raw=true",
+              title = "gmri.org", height = "80px"),
+          style = "padding-top: 10px; padding-bottom: 10px; margin-left: 20px;"
+        ),
+        a(href = 'https://www.maine.gov/dmr/home',
+          img(src = "https://d3esu6nj4wau0q.cloudfront.net/images/MaineDMR_logo.width-460.png",
+              title = "Maine DMR Website", height = "80px"),
+          style = "padding-top: 10px; padding-bottom: 10px; margin-left: 20px;"  # Adjust margin-left as needed
+        )
       ),
       class = "dropdown",
       tags$style(".main-header {max-height: 100px}"),
       tags$style(".main-header .logo {height: 100px}")
     )
-  ),
+  )
+    ,
   sidebar,
   dashboardBody(
     gmri_colors,
     fluidPage(
       tweaks,
       tabItems(
+        tabItem(
+          tabName = "Home",
+          fluidPage(
+            tags$style(HTML("
+      .home-background {
+        background-color: #00736D;
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start; /* Align content to the top */
+        align-items: center;
+        border-radius: 35px;
+        padding-top: 35px; /* Add a small buffer (adjust the value according to your preference) */
+        position: relative; /* Set position to relative for proper placement of the image */
+      }
+      .overlay {
+        position: absolute;
+        top: 0;
+        left: 25;
+        width: 90%;
+        height: 40%;
+        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+        border-radius: 35px; /* Rounded corners for the overlay */
+        z-index: 1; /* Place overlay behind the text */
+      }
+      .home-content {
+        text-align: center;
+        color: white;
+        max-width: 850px;
+        z-index: 2; /* Ensure text is above the overlay */
+      }
+      .boat-image {
+        position: absolute; /* Position the image absolutely within the .home-background */
+        top: -20px; /* Distance from the top (adjust as needed) */
+        left: 50%; /* Center the image horizontally */
+        transform: translateX(-50%); /* Center the image horizontally */
+        border-radius: 35px; /* Rounded corners for the image */
+        z-index: 0; /* Place image behind the text and overlay */
+      }
+    ")),
+            div(class = "home-background",
+                img(src = "coastal-excursion-aerial.jpg", class = "boat-image", width = "2100px"),  # Add the boat image here
+                div(class = "overlay"),  # Add overlay here
+                div(class = "home-content",
+                    tags$h1("Monitoring Ecosystem Change to Support Fisheries Decision-Making in Maine's Coastal Waters", style = "font-size: 36px;"),
+                    tags$p("Warming in Maine’s coastal waters is reshaping the ecosystem and impacting key fishery resources and communities. Information on the state of the ecosystem will improve our ability to make informed decisions in the face of climate change and support a holistic, ecosystem-based approach to managing Maine’s marine resources. The goal of this study is to develop an integrated ecosystem assessment (IEA) focused on characterizing the status and trends of the fishery ecosystem in Maine’s coastal waters.", style = "font-size: 18px;")
+                )
+            )
+          )
+        )
+        
+        , #close tabitem
+        
+
         tabItem(
           tabName = "Plots",
           h2("Choose Variables & Plot (up to 5 Total)"),
@@ -232,11 +312,16 @@ server <- function(input, output,session) {
       })
       fig <- subplot(plot_list, nrows = num_variables, shareX = TRUE)
       
+      # Set y-axis label based on selected checkbox labels
+      y_labels <- c(input$variable, input$Stockdata)
+      for (i in 1:num_variables) {
+        fig <- fig %>% layout(yaxis = list(title = y_labels[i]))
+      }
       
       layout(fig, xaxis = list(title = "Year"),
              plot_bgcolor = '#e5ecf6', 
              xaxis2 = list(zerolinecolor = '#ffff', zerolinewidth = 2, gridcolor = 'ffff'), 
-             yaxis2 = list(zerolinecolor = '#ffff', zerolinewidth = 2, gridcolor = 'ffff'))}
+             yaxis = list(zerolinecolor = '#ffff', zerolinewidth = 2, gridcolor = 'ffff'))}
   })#close renderPlotly
   
   # choose columns to display
@@ -290,7 +375,7 @@ server <- function(input, output,session) {
   output$Stockdata_selector2 = renderUI({ #creates Species select box object called in ui
     selectInput(inputId = "Stockdata2", #name of input
                 label = "Stock Data:", #label displayed in ui
-                choices = names(Both2[19:25]%>%select(grep(input$Species, names(.), ignore.case = T))),
+                choices = names(Both2[20:26]%>%select(grep(input$Species, names(.), ignore.case = T))),
                 selected = NULL,multiple=TRUE)
   })
   ##############
