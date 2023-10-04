@@ -1,0 +1,81 @@
+File C:\Users\jbehan\Openscapes_JB\FVCOM\GLORYs112_salinty2.nc (NC_FORMAT_CLASSIC):
+
+     1 variables (excluding dimension variables):
+        short so[longitude,latitude,depth,time]   
+            _FillValue: -32767
+            long_name: Salinity
+            standard_name: sea_water_salinity
+            units: 1e-3
+            unit_long: Practical Salinity Unit
+            cell_methods: area: mean
+            add_offset: -0.00152592547237873
+            scale_factor: 0.00152592547237873
+            _ChunkSizes: 1
+             _ChunkSizes: 17
+             _ChunkSizes: 681
+             _ChunkSizes: 1440
+
+     4 dimensions:
+        time  Size:336 
+            units: hours since 1950-01-01
+            axis: T
+            long_name: Time (hours since 1950-01-01)
+            standard_name: time
+            calendar: gregorian
+            _ChunkSizes: 1
+            _CoordinateAxisType: Time
+            valid_min: 377316
+            valid_max: 622020
+        depth  Size:1 
+            valid_min: 0.494024991989136
+            valid_max: 0.494024991989136
+            units: m
+            positive: down
+            unit_long: Meters
+            long_name: Depth
+            standard_name: depth
+            axis: Z
+            _ChunkSizes: 50
+            _CoordinateAxisType: Height
+            _CoordinateZisPositive: down
+        latitude  Size:73 
+            valid_min: 39
+            valid_max: 45
+            step: 0.0833358764648438
+            units: degrees_north
+            unit_long: Degrees North
+            long_name: Latitude
+            standard_name: latitude
+            axis: Y
+            _ChunkSizes: 2041
+            _CoordinateAxisType: Lat
+        longitude  Size:97 
+            valid_min: -74.5
+            valid_max: -66.5
+            step: 0.0833282470703125
+            units: degrees_east
+            unit_long: Degrees East
+            long_name: Longitude
+            standard_name: longitude
+            axis: X
+            _ChunkSizes: 4320
+            _CoordinateAxisType: Lon
+
+    17 global attributes:
+        title: Monthly mean fields for product GLOBAL_REANALYSIS_PHY_001_030
+        references: http://marine.copernicus.eu
+        credit: E.U. Copernicus Marine Service Information (CMEMS)
+        licence: http://marine.copernicus.eu/services-portfolio/service-commitments-and-licence/
+        contact: servicedesk.cmems@mercator-ocean.eu
+        producer: CMEMS - Global Monitoring and Forecasting Centre
+        institution: Mercator Ocean
+        Conventions: CF-1.6
+        area: GLOBAL
+        product: GLOBAL_REANALYSIS_001_030
+        dataset: global-reanalysis-001-030-monthly
+        source: MERCATOR GLORYS12V1
+        product_user_manual: http://marine.copernicus.eu/documents/PUM/CMEMS-GLO-PUM-001-030.pdf
+        quality_information_document: http://marine.copernicus.eu/documents/QUID/CMEMS-GLO-QUID-001-030.pdf
+        _CoordSysBuilder: ucar.nc2.dataset.conv.CF1Convention
+        comment: 
+        history: Data extracted from dataset http://localhost:8080/thredds/dodsC/cmems_mod_glo_phy_my_0.083_P1M-m
