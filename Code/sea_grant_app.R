@@ -115,9 +115,10 @@ gmri_colors<-tags$head(tags$style(HTML('
 ###### Define UI ######
 ui <- dashboardPage(
   dashboardHeader(
-    title = span("Visualizing Environmental Indicators in the Gulf of Maine", 
-                 style = "color: #E9E9E9; font-size: 28px; font-weight: bold; font-family: Arial"),
-    titleWidth = 540,
+    #title = span("Visualizing Environmental Indicators in the Gulf of Maine", 
+    #             style = "color: #E9E9E9; font-size: 28px; font-weight: bold; font-family: Arial"),
+    #titleWidth = 540,
+    titleWidth = 150,
     tags$li(
       div(
         style = "display: flex; align-items: center;",
@@ -217,7 +218,7 @@ ui <- dashboardPage(
           ),
           radioButtons("Plotting_Style", "Select Plotting Style",
                        choices = c("Layered" = "Layered", "Stacked" = "Stacked"),
-                       selected = "Layered"),
+                       selected = "Stacked"),
           mainPanel(
             width = 12,
             tabsetPanel(
