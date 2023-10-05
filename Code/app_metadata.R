@@ -101,6 +101,18 @@ metadata <-tabItem(tabName = "Metadata",
                 "Striped Bass commercial landings in metric tons. 1947-2017. Data were sourced from the 2018 Benchmark Stock Assessment (SAW 66)"
               ),
               accordionItem(
+                title = "Female SSB (mt):",
+                status = "primary",
+                collapsed = FALSE,
+                "Striped Bass female spawning stock biomass in metric tons. 1982-2021. Data were sourced from the 2021 Striped Bass assessment update"
+              ),
+              accordionItem(
+                title = "Fishing Mortality Rate (Full F):",
+                status = "primary",
+                collapsed = FALSE,
+                "Striped Bass Fishing Mortality. 1982-2021. Data were sourced from the 2021 Striped Bass assessment update"
+              ),
+              accordionItem(
                 title = "Recreational Landings (mt):",
                 status = "primary",
                 collapsed = FALSE,

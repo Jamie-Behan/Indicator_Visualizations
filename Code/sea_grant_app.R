@@ -376,7 +376,7 @@ server <- function(input, output,session) {
   output$Stockdata_selector2 = renderUI({ #creates Species select box object called in ui
     selectInput(inputId = "Stockdata2", #name of input
                 label = "Stock Data:", #label displayed in ui
-                choices = names(Both2[20:26]%>%select(grep(input$Species, names(.), ignore.case = T))),
+                choices = names(Both2[20:28]%>%select(grep(input$Species, names(.), ignore.case = T))),
                 selected = NULL,multiple=TRUE)
   })
   ##############
