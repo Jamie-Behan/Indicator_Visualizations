@@ -1,7 +1,8 @@
+#This script was run to create the "mean_salinity_GLORYs.csv" data file, which is used in sea_grant_app.R as the salinity timeseries
 library(pacman)
 pacman::p_load(readxl,sdm,raster,sf,ncdf4,maptools,rgdal,maps,mapdata,dplyr,viridis,sp,rgeos,writexl,RColorBrewer,classInt,raster,akima)
 
-dat <- nc_open(choose.files())
+dat <- nc_open(choose.files()) #need to select "GLORYs112_salinity2" data
 
 lon <- ncvar_get(dat, "longitude")
 lat <- ncvar_get(dat, "latitude", verbose = F)
