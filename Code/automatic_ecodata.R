@@ -82,32 +82,20 @@ hudson_river<-hudson_river%>% filter(Time >= "1960")
 names(ecodata_df)[1] <- "Year"
 names(hudson_river)[1] <- "Year"
 GOM_ecodata <-ecodata_df[ecodata_df$EPU == 'GOM',]
-#GB_ecodata <-ecodata_df[ecodata_df$EPU == 'GB',]
-#MAB_ecodata <-ecodata_df[ecodata_df$EPU == 'MAB',]
-#SS_ecodata <-ecodata_df[ecodata_df$EPU == 'SS',]
 ALL_ecodata <-ecodata_df[ecodata_df$EPU == 'All',]
 hudson_river <-hudson_river[hudson_river$EPU == 'MAB',]
 rm(ecodata_df,other_df)
 
 
 GOM_ecodata <-reshape2::dcast(GOM_ecodata,Year~Var,value.var="Value")
-#GB_ecodata <-reshape2::dcast(GB_ecodata,Year~Var,value.var="Value")
-#MAB_ecodata <-reshape2::dcast(MAB_ecodata,Year~Var,value.var="Value")
-#SS_ecodata <-reshape2::dcast(SS_ecodata,Year~Var,value.var="Value")
 ALL_ecodata <-reshape2::dcast(ALL_ecodata,Year~Var,value.var="Value")
 hudson_river <-reshape2::dcast(hudson_river,Year~Var,value.var="Value")#hudson riverflow data
 
 colnames(GOM_ecodata)<- paste(colnames(GOM_ecodata),"GOM",sep="_")
-#colnames(GB_ecodata)<- paste(colnames(GB_ecodata),"GB",sep="_")
-#colnames(MAB_ecodata) <- paste(colnames(MAB_ecodata),"MAB",sep="_")
-#colnames(SS_ecodata)<- paste(colnames(SS_ecodata),"SS",sep="_")
 colnames(ALL_ecodata)<- paste(colnames(ALL_ecodata),"ALL",sep="_")
 colnames(hudson_river)<- paste(colnames(hudson_river),"MAB",sep="_") #hudson riverflow data
 
 names(GOM_ecodata)[1] <- "Year"
-#names(GB_ecodata)[1] <- "Year"
-#names(MAB_ecodata)[1] <- "Year"
-#names(SS_ecodata)[1] <- "Year"
 names(ALL_ecodata)[1] <- "Year"
 names(hudson_river)[1] <- "Year" #hudson riverflow data
 
