@@ -96,3 +96,5 @@ for (df_name in names(data_frames)) {
 merged_df <- Reduce(function(x, y) merge(x, y, by = "YEAR", all = TRUE), data_frames)
 # Rename "YEAR" column to "Year" because the other dfs used in the app use "Year"
 colnames(merged_df)[colnames(merged_df) == "YEAR"] <- "Year"
+DisMAPdata<-merged_df
+rm(merged_df)
