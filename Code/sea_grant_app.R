@@ -1,3 +1,5 @@
+#### Species Tab test ######
+
 #### Load R packages ######
 if (!require("pacman")) install.packages("pacman")
 library(pacman)
@@ -82,8 +84,9 @@ sidebar <- dashboardSidebar(width = 150,
                             tags$style(".left-side, .main-sidebar {padding-top: 100px}"),
                             sidebarMenu(
                               menuItem("Home", tabName = "Home", icon = icon("house")),
-                              menuItem("Plots", tabName = "Plots", icon = icon("chart-line")),
-                              menuItem("Data", tabName = "Data",icon = icon("table")),
+                              menuItem("Striped Bass", tabName = "StripedBass", icon = icon("fish")),
+                              menuItem("Bluefin Tuna", tabName = "BluefinTuna",icon = icon("fish")),
+                              menuItem("American Lobster", tabName = "AmericanLobster",icon = icon("fish")),
                               menuItem("Metadata", tabName = "Metadata",icon = icon("list"))
                               
                             ),
@@ -115,9 +118,6 @@ gmri_colors<-tags$head(tags$style(HTML('
 ###### Define UI ######
 ui <- dashboardPage(
   dashboardHeader(
-    #title = span("Visualizing Environmental Indicators in the Gulf of Maine", 
-    #             style = "color: #E9E9E9; font-size: 28px; font-weight: bold; font-family: Arial"),
-    #titleWidth = 540,
     titleWidth = 150,
     tags$li(
       div(
@@ -144,7 +144,7 @@ ui <- dashboardPage(
       tags$style(".main-header .logo {height: 100px}")
     )
   )
-    ,
+  ,
   sidebar,
   dashboardBody(
     gmri_colors,
@@ -205,10 +205,100 @@ ui <- dashboardPage(
         
         , #close tabitem
         
-
+        
         tabItem(
-          tabName = "Plots",
-          h2("Choose Variables & Plot (up to 5 Total)"),
+          tabName = "StripedBass",
+          h2(
+            img(
+              src = "https://www.fisheries.noaa.gov/s3/styles/original/s3/2022-08/640x427-StripedBass-NOAAFisheries.png?itok=4ZQoQM0S",
+              style = "width: 250px; height: auto; vertical-align: middle; margin-right: 10px;"
+            ),
+            HTML('<strong style="font-size: 40px;">Atlantic Striped Bass</strong> (<em>Morone saxatilis</em>)')
+          ),
+          mainPanel(
+            width = 12,
+            tabsetPanel(
+              type = "tabs",
+              tabPanel(
+                "Range & Info",
+                fluidRow(
+                  column(
+                    width = 4,
+                    HTML('<div style="width: 100%; height: 400px; background-color: black; margin-top: 30px;"></div>')
+                  ),
+                  column(
+                    width = 8,
+                    h3("Overview"),
+                    p("Striped bass is an anadromous species native to the northeastern and central Atlantic coast of the United States and has a complex 
+                      life cycle involving spawning in coastal rivers and estuaries, followed by long-range migrations to feeding and overwintering 
+                      grounds. In Maine, striped bass fishing is a popular recreational activity, with the recreational harvest of striped bass routinely 
+                      surpassing that of the commercial harvest. Historically, striped bass spawned in numerous rivers along coastal New England, but now 
+                      rely on Chesapeake Bay and the Hudson River for the majority of spawning (Little 1995). Approximately 90% of the striped bass 
+                      population spawn in the Chesapeake Bay region (Little 1995). The striped bass fishery supports numerous shore-side businesses for 
+                      Maine’s economy, such as boat sales and rentals, bait and tackle shops, and fishing guide businesses. Striped bass landings are 
+                      dependent upon the migration timing and persistence in Maine waters, which have experienced changes associated with ocean warming 
+                      (Peer and Miller 2014; Secor et al. 2020). Changes in the timing and persistence of ecologically and economically important 
+                      migratory species such as striped bass can lead to implications to both the management of this species, as well as the economic 
+                      value of the fishery to the state.",
+                      style = "font-size: 18px;text-align: justify;"),
+                    h4("For more information, click the link below:", style = "padding-top: 40px;"),
+                    tags$li(
+                      HTML('<a href="C:/Users/jbehan/Box/Kerr Lab/Fisheries Science Lab/NCLIM/Indicator_Visualizations/Indicator_Visualizations2/papers_writeups/StripedBassliteraturereview.pdf" style="font-size: 18px;" target="_blank">Environmental Effects on Striped Bass Stock Dynamics</a>')
+                    )
+                  )
+                )
+              ),
+              tabPanel(
+                "Interactive Plots",
+                h2("Choose Variables & Plot (up to 5 Total)"),
+                fluidRow(
+                  column(
+                    width = 12,
+                    h3("Stock Variables"),
+                    selectInput("plotSpecies", "plotSpecies", choices = c("Striped Bass" = "Striped_Bass")),
+                    uiOutput("Stockdata_selector")
+                  ),
+                  column(
+                    width = 6,
+                    controls,
+                    radioButtons(
+                      "Plotting_Style",
+                      "Select Plotting Style",
+                      choices = c("Layered" = "Layered", "Stacked" = "Stacked"),
+                      selected = "Stacked"
+                    )
+                  )
+                ),
+                mainPanel(
+                  width = 12,
+                  tabsetPanel(
+                    type = "tabs",
+                    tabPanel("Plot", plotlyOutput("plot"))
+                  )
+                )
+              ),
+              tabPanel(
+                "Data",
+                h2("View Data Tables"),
+                sidebarPanel(
+                  controls2,
+                  h3("Select Species and Stock Variables"),
+                  width = 12,
+                  selectInput("Species", "Species", choices = c("Striped Bass" = "Striped_Bass")),
+                  uiOutput("Stockdata_selector2")
+                ),
+                hr(style = "border-top: 1px solid #000000;"),
+                mainPanel(width = 12, tabsetPanel(id = 'dataset', tabPanel("Data", DT::dataTableOutput("mytable1"))))
+              )
+            )
+          )
+        ), #close tabitem
+        tabItem(
+          tabName = "BluefinTuna",
+          h2(
+            img(src = "https://www.fisheries.noaa.gov/s3/styles/original/s3/2022-09/640x427-Tuna-Bluefin-NOAAFisheries.png?itok=G5iVOYPt", style = "width: 250px; height: auto; vertical-align: middle; margin-right: 10px;"),
+            HTML('<strong style="font-size: 40px;">Atlantic Bluefin Tuna</strong> (<em>Thunnus thynnus</em>)')
+          ),
           sidebarPanel(
             controls,
             h3("Select Species and Stock Variables"),
@@ -227,25 +317,36 @@ ui <- dashboardPage(
             )
           )
         ), #close tabitem
-        tabItem(tabName = "Data",
-                h2("View Data Tables"),
-                sidebarPanel(controls2,
-                             
-                             h3("Select Species and Stock Variables"),width=12,
-                             selectInput("Species", "Species", choices = c("Striped Bass"="Striped_Bass")),
-                             uiOutput("Stockdata_selector2")),
-                
-                hr(style = "border-top: 1px solid #000000;"),
-                mainPanel(width = 12,
-                          tabsetPanel(id = 'dataset',
-                                      tabPanel("Data", DT::dataTableOutput("mytable1"))))
-        ),
-####Source metadata code ####
+        tabItem(
+          tabName = "AmericanLobster",
+          h2(
+            img(src = "https://www.fisheries.noaa.gov/s3/styles/original/s3/dam-migration/640x427-american-lobster.png?itok=FX0oMipE", style = "width: 250px; height: auto; vertical-align: middle; margin-right: 10px;"),
+            HTML('<strong style="font-size: 40px;">American Lobster</strong> (<em>Homarus americanus</em>)')
+          ),
+          sidebarPanel(
+            controls,
+            h3("Select Species and Stock Variables"),
+            width = 12,
+            selectInput("plotSpecies", "plotSpecies", choices = c("Striped Bass" = "Striped_Bass")),
+            uiOutput("Stockdata_selector")
+          ),
+          radioButtons("Plotting_Style", "Select Plotting Style",
+                       choices = c("Layered" = "Layered", "Stacked" = "Stacked"),
+                       selected = "Stacked"),
+          mainPanel(
+            width = 12,
+            tabsetPanel(
+              type = "tabs",
+              tabPanel("Plot", plotlyOutput("plot"))
+            )
+          )
+        ), #close tabitem
+        ####Source metadata code ####
         source(here("Code/app_metadata.R"), local = TRUE)$value
-          )#close tabItems
-        )#close fluidpage
-      )#close dashboard body
-    )#close dashboardpage
+      )#close tabItems
+    )#close fluidpage
+  )#close dashboard body
+)#close dashboardpage
 ###### Define server function  ######
 server <- function(input, output,session) {
   dataDf <- reactive({
@@ -326,11 +427,11 @@ server <- function(input, output,session) {
   })#close renderPlotly
   
   # choose columns to display
-#  output$mytable1 <- DT::renderDataTable({
-#    table2<-as.data.frame(Both2[, c(input$show_vars,input$Stockdata2), drop = FALSE])
-    #DT::datatable(tail(table2,n=(second_col(table2)+5)))
-#    DT::datatable(tail(table2,n=(second_col(table2))))
-#  })
+  #  output$mytable1 <- DT::renderDataTable({
+  #    table2<-as.data.frame(Both2[, c(input$show_vars,input$Stockdata2), drop = FALSE])
+  #DT::datatable(tail(table2,n=(second_col(table2)+5)))
+  #    DT::datatable(tail(table2,n=(second_col(table2))))
+  #  })
   output$mytable1 <- DT::renderDataTable({
     table2 <- as.data.frame(Both2[, c(input$show_vars, input$Stockdata2), drop = FALSE])
     
