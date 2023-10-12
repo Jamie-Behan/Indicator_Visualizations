@@ -82,8 +82,8 @@ data_frames <- lapply(data_frames, function(df) {
 ########### Merging DFs and renaming columns ##########
 # Function to rename columns based on species name and season
 rename_columns <- function(df, species, season) {
-  colnames(df) <- gsub("COG Lat", paste(species, season, "COG Lat", sep = "_"), colnames(df))
-  colnames(df) <- gsub("COG depth", paste(species, season, "COG depth", sep = "_"), colnames(df))
+  colnames(df) <- gsub("COG Lat", paste(species, season, "Lat_COG", sep = "_"), colnames(df))
+  colnames(df) <- gsub("COG depth", paste(species, season, "Depth_COG", sep = "_"), colnames(df))
   return(df)
 }
 
@@ -92,8 +92,13 @@ for (df_name in names(data_frames)) {
   data_frames[[df_name]] <- rename_columns(data_frames[[df_name]], df_name, "Season")  # Replace "Season" with the actual season name
 }
 
+
 # Merge all data frames by the "Year" column
 merged_df <- Reduce(function(x, y) merge(x, y, by = "YEAR", all = TRUE), data_frames)
+# Get column names containing the word "Season"
+season_columns <- grepl("Season", names(merged_df))
+# Modify column names by removing "Season"
+names(merged_df)[season_columns] <- gsub("_Season", "", names(merged_df)[season_columns])
 # Rename "YEAR" column to "Year" because the other dfs used in the app use "Year"
 colnames(merged_df)[colnames(merged_df) == "YEAR"] <- "Year"
 DisMAPdata<-merged_df

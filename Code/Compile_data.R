@@ -18,7 +18,7 @@ Both <- list(big_ecodata, salinity_data,stock_assess_data,DisMAPdata)
 Both <-Reduce(function(x, y) merge(x, y, by="Year",all=T), Both)
 Both <-Both[rowSums(is.na(Both)) != ncol(Both), ] #removes rows containing all NAs
 
-uniquecolnames <- unique(gsub("_[^_]+$", "", names(Both)[-1])) #get unique column names excluding year
+
 
 #Both2<-as.data.frame(big_ecodata)
 Both2<-as.data.frame(Both[c(1:19,31:34)]) #dismap herring data is being treated as ENV var and lobster data as fish data
@@ -27,4 +27,8 @@ Both2 <- list(Both[1],Both2, stock_assess_data,DisMAPdata[c(1,2,3,8,9)])
 Both2 <-Reduce(function(x, y) merge(x, y, by="Year",all=T), Both2)
 Both2 <-Both2[rowSums(is.na(Both2)) != ncol(Both2), ] #removes rows containing all NAs
 #the Both2 df is the same as "Both", but is organized in alphabetical order
+
+uniquecolnames <- unique(gsub("_[^_]+$", "", names(Both2)[-1])) #get unique column names excluding year
+
+
 rm(big_ecodata,DisMAPdata,ecodata_df,salinity_data,stock_assess_data)

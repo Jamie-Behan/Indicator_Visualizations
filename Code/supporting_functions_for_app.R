@@ -18,7 +18,7 @@ controls <-
                 class = 'multicol', 
                 checkboxGroupInput("variable", 
                                    label = NULL, 
-                                   choiceNames  = sort(gsub("_", " ", uniquecolnames[c(1:18,29:30)]),decreasing = FALSE), ##replace_with space and select columns on env data only
+                                   choiceNames  = sort(gsub("_", " ", uniquecolnames[c(1:22)]),decreasing = FALSE), ##replace_with space and select columns on env data only
                                    
                                    choiceValues = sort(colnames(Both2[2:23]),decreasing = FALSE),  ##select columns on env data only
                                    selected = c("Bottom_Temp_Anomaly_GOM",multiple = TRUE)) 
