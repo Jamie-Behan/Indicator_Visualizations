@@ -13,9 +13,9 @@ for (file in csv_files) {
   data_frames[[df_name]] <- read.csv(file) # Read the .csv file and store it as a data frame in the list
 }
 # View each data frame in the list
-for (df_name in names(data_frames)) {
-  View(data_frames[[df_name]])
-}
+#for (df_name in names(data_frames)) {
+#  View(data_frames[[df_name]])
+#}
 ######## Rename each dataframe in the list based on species and season #######
 # Loop through each data frame in the list
 for (df_name in names(data_frames)) {
@@ -53,7 +53,7 @@ for (df_name in names(data_frames)) {
 # Print the names of the renamed data frames
 print(names(data_frames))
 
-View(data_frames[["American_lobster_Spring"]])
+#View(data_frames[["American_lobster_Spring"]])
 ########### deleting first two rows and making row 3 the new column names ###########
 # Loop through each data frame in the list
 for (df_name in names(data_frames)) {
@@ -68,7 +68,7 @@ for (df_name in names(data_frames)) {
   data_frames[[df_name]] <- data_frames[[df_name]][-1, , drop = FALSE]
 }
 
-View(data_frames[["American_lobster_Spring"]])
+#View(data_frames[["American_lobster_Spring"]])
 
 ######### Remove "Min Lat" and "Max Lat" columns from each data frame in the list###########
 data_frames <- lapply(data_frames, function(df) {
@@ -78,7 +78,7 @@ data_frames <- lapply(data_frames, function(df) {
   return(df)
 })
 
-View(data_frames[["American_lobster_Spring"]])
+#View(data_frames[["American_lobster_Spring"]])
 ########### Merging DFs and renaming columns ##########
 # Function to rename columns based on species name and season
 rename_columns <- function(df, species, season) {
@@ -97,4 +97,4 @@ merged_df <- Reduce(function(x, y) merge(x, y, by = "YEAR", all = TRUE), data_fr
 # Rename "YEAR" column to "Year" because the other dfs used in the app use "Year"
 colnames(merged_df)[colnames(merged_df) == "YEAR"] <- "Year"
 DisMAPdata<-merged_df
-rm(merged_df)
+rm(merged_df,data_frames)
