@@ -61,32 +61,38 @@ ui <- dashboardPage(
               ),
               tabPanel(
                 "Interactive Plots",
-                h2("Choose Stock and Environmental Variables"),
+                h2("Choose Stock and Environmental Variables", style = "font-weight: bold;"),
                 fluidRow(
                   column(
                     width = 6,
-                    h3("Stock Variables"),
-                    h4("Variables Related to Recruitment"),
-                    fish_controls(c("Striped_Bass_Age1_Abundance","Striped_Bass_Female_SSB")), #fish data checkboxes
-                    #h4("Variables Related to Distribution"),
-                    #fish_controls(),
-                    h4("Variables Related to Growth"),
-                    fish_controls(c("Striped_Bass_WAA1_kg","Striped_Bass_WAA4_kg")),
-                    h4("Other Variables"),
-                    fish_controls(c("Striped_Bass_Total_Abundance","Striped_Bass_Commercial_Landings",
-                                  "Striped_Bass_Recreational_Landings","Striped_Bass_Maine_Recreational_Harvest","Striped_Bass_Full_F")),
-                  ),
-                  column(
-                    width = 6,
-                    controls, #environmental data checkboxes
+                    h3("Stock Variables", style = "font-weight: bold;"),
+                    h4("Variables related to recruitment", style = "font-weight: bold;"),
+                    div(class = "fish-controls",fish_controls(c("Striped_Bass_Age1_Abundance", "Striped_Bass_Female_SSB"))),
+                    h4("Variables related to growth", style = "font-weight: bold;"),
+                    div(class = "fish-controls",fish_controls(c("Striped_Bass_WAA1_kg", "Striped_Bass_WAA4_kg"))),
+                    h4("Other variables", style = "font-weight: bold;"),
+                    div(class = "fish-controls",fish_controls(c("Striped_Bass_Total_Abundance", "Striped_Bass_Commercial_Landings",
+                                                                 "Striped_Bass_Recreational_Landings", "Striped_Bass_Maine_Recreational_Harvest", "Striped_Bass_Full_F"))),
                     radioButtons(
                       "Plotting_Style",
                       "Select Plotting Style",
                       choices = c("Layered" = "Layered", "Stacked" = "Stacked"),
                       selected = "Stacked"
                     )
-                  )
-                ),
+                  ),
+                  column(
+                    width = 6,
+                    h3("Environmental Variables", style = "font-weight: bold;"),
+                    h4("Abiotic", style = "font-weight: bold;"),
+                    div(class = "fish-controls",fish_controls(c("AMO_Annual_Mean","Annual_Bottom_Temp_Absolute_GOM","SST_Temp_Anomaly_GOM",
+                    "Bottom_Temp_Anomaly_GOM","GLORYS_Bottom_Temp_Anomaly_GOM","GSI_ALL","Hudson_River_Flow_Rate_MAB",
+                    "NAO_ALL","Surface_Salinity_Mean"))),
+                    h4("Biotic", style = "font-weight: bold;"),
+                    div(class = "fish-controls",fish_controls(c("Annual_Forage_Fish_Biomass_GOM",
+                                                                "Atlantic_herring_Fall_Depth_COG","Atlantic_herring_Fall_Lat_COG","Atlantic_herring_Spring_Depth_COG",   
+                                                                "Atlantic_herring_Spring_Lat_COG","Calfin_anomaly_GOM","Large_Copepods_Abundance_Anomaly_GOM",
+                                                                "Small_Copepods_Abundance_Anomaly_GOM")))
+                  )),
                 mainPanel(
                   width = 12,
                   tabsetPanel(
