@@ -11,96 +11,13 @@ source(here("Code/supporting_functions_for_app.R"))
 ##########################
 ###### Define UI ######
 ui <- dashboardPage(
-  dashboardHeader(
-    titleWidth = 150,
-    tags$li(
-      div(
-        style = "display: flex; align-items: center;",
-        a(href = 'https://umaine.edu/marine/',
-          img(src = "https://i.pinimg.com/originals/a6/56/72/a656729123a2857f93010c5a9aa70c0d.png",
-              title = "Umaine School of Marine Science", height = "80px"),
-          style = "padding-top: 10px; padding-bottom: 10px;"
-        ),
-        style = "display: flex; align-items: center;",
-        a(href = 'https://www.gmri.org/',
-          img(src = "https://github.com/gulfofmaine/gmRi/blob/master/inst/stylesheets/gmri_logo.png?raw=true",
-              title = "gmri.org", height = "80px"),
-          style = "padding-top: 10px; padding-bottom: 10px; margin-left: 20px;"
-        ),
-        a(href = 'https://www.maine.gov/dmr/home',
-          img(src = "https://d3esu6nj4wau0q.cloudfront.net/images/MaineDMR_logo.width-460.png",
-              title = "Maine DMR Website", height = "80px"),
-          style = "padding-top: 10px; padding-bottom: 10px; margin-left: 20px;"  # Adjust margin-left as needed
-        )
-      ),
-      class = "dropdown",
-      tags$style(".main-header {max-height: 100px}"),
-      tags$style(".main-header .logo {height: 100px}")
-    )
-  )
-  ,
-  sidebar,
-  dashboardBody(
-    gmri_colors,
-    fluidPage(
-      tweaks,
+  dashboardHeader(titleWidth = 150,headerlogos),   #logos that appear in the header. see "supporting_functions_for_app.R"
+  sidebar, #sidebar. see "supporting_functions_for_app.R"
+  dashboardBody(gmri_colors,
+    fluidPage(tweaks,
       tabItems(
-        tabItem(
-          tabName = "Home",
-          fluidPage(
-            tags$style(HTML("
-      .home-background {
-        background-color: #00736D;
-        height: 100vh;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start; /* Align content to the top */
-        align-items: center;
-        border-radius: 35px;
-        padding-top: 35px; /* Add a small buffer (adjust the value according to your preference) */
-        position: relative; /* Set position to relative for proper placement of the image */
-      }
-      .overlay {
-        position: absolute;
-        top: 0;
-        left: 25;
-        width: 90%;
-        height: 40%;
-        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
-        border-radius: 35px; /* Rounded corners for the overlay */
-        z-index: 1; /* Place overlay behind the text */
-      }
-      .home-content {
-        text-align: center;
-        color: white;
-        max-width: 850px;
-        z-index: 2; /* Ensure text is above the overlay */
-      }
-      .boat-image {
-        position: absolute; /* Position the image absolutely within the .home-background */
-        top: -20px; /* Distance from the top (adjust as needed) */
-        left: 50%; /* Center the image horizontally */
-        transform: translateX(-50%); /* Center the image horizontally */
-        border-radius: 35px; /* Rounded corners for the image */
-        z-index: 0; /* Place image behind the text and overlay */
-      }
-    ")),
-            div(class = "home-background",
-                img(src = "coastal-excursion-aerial.jpg", class = "boat-image", width = "2100px"),  # Add the boat image here
-                div(class = "overlay"),  # Add overlay here
-                div(class = "home-content",
-                    tags$h1("Monitoring Ecosystem Change to Support Fisheries Decision-Making in Maine's Coastal Waters", style = "font-size: 36px;"),
-                    tags$p("Warming in Maine’s coastal waters is reshaping the ecosystem and impacting key fishery resources and communities. Information on the state of the ecosystem will improve our ability to make informed decisions in the face of climate change and support a holistic, ecosystem-based approach to managing Maine’s marine resources. The goal of this study is to develop an integrated ecosystem assessment (IEA) focused on characterizing the status and trends of the fishery ecosystem in Maine’s coastal waters.", style = "font-size: 18px;")
-                )
-            )
-          )
-        )
-        
-        , #close tabitem
-        
-        
-        tabItem(
+        Hometab, 
+        tabItem(     #Stripedbass tab
           tabName = "StripedBass",
           h2(
             img(
@@ -144,17 +61,24 @@ ui <- dashboardPage(
               ),
               tabPanel(
                 "Interactive Plots",
-                h2("Choose Variables & Plot (up to 5 Total)"),
+                h2("Choose Stock and Environmental Variables"),
                 fluidRow(
                   column(
-                    width = 12,
+                    width = 6,
                     h3("Stock Variables"),
-                    selectInput("plotSpecies", "plotSpecies", choices = c("Striped Bass" = "Striped_Bass")),
-                    uiOutput("Stockdata_selector")
+                    h4("Variables Related to Recruitment"),
+                    fish_controls(c("Striped_Bass_Age1_Abundance","Striped_Bass_Female_SSB")), #fish data checkboxes
+                    #h4("Variables Related to Distribution"),
+                    #fish_controls(),
+                    h4("Variables Related to Growth"),
+                    fish_controls(c("Striped_Bass_WAA1_kg","Striped_Bass_WAA4_kg")),
+                    h4("Other Variables"),
+                    fish_controls(c("Striped_Bass_Total_Abundance","Striped_Bass_Commercial_Landings",
+                                  "Striped_Bass_Recreational_Landings","Striped_Bass_Maine_Recreational_Harvest","Striped_Bass_Full_F")),
                   ),
                   column(
                     width = 6,
-                    controls,
+                    controls, #environmental data checkboxes
                     radioButtons(
                       "Plotting_Style",
                       "Select Plotting Style",
