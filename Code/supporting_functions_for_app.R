@@ -1,49 +1,53 @@
 ###### tweaks, a list object to set up multiple-columns for checkboxGroupInput#####
-tweaks <- 
-  list(tags$head(tags$style(HTML("
-                                 .multicol { 
-                                   height: 300px;
-                                   -webkit-column-count: 2; /* Chrome, Safari, Opera */ 
-                                   -moz-column-count: 2;    /* Firefox */ 
-                                   column-count: 2; 
-                                   -moz-column-fill: auto;
-                                   -column-fill: auto;
-                                 } 
-                                 ")) 
-  ))
-##### data control: the checkboxes will control the data values plotted ######
-controls <-
-  list( 
-       tags$div(align = 'left', 
-                class = 'multicol', 
-                checkboxGroupInput("variable", 
-                                   label = NULL, 
-                                   choiceNames  = sort(gsub("_", " ", uniquecolnames[c(1:22)]),decreasing = FALSE), ##replace_with space and select columns on env data only
-                                   
-                                   choiceValues = sort(colnames(Both2[2:23]),decreasing = FALSE),  ##select columns on env data only
-                                   selected = c("Bottom_Temp_Anomaly_GOM",multiple = TRUE)) 
-                
-       )#close tags$div
-  )#close list 
+tweaks <- list(
+  tags$head(
+    tags$style(HTML("
+      .multicol { 
+        height: 300px;
+        -webkit-column-count: 2; /* Chrome, Safari, Opera */ 
+        -moz-column-count: 2;    /* Firefox */ 
+        column-count: 2; 
+        -moz-column-fill: auto;
+        -column-fill: auto;
+      }
+      .fish-controls {margin-bottom: 20px; /* Bottom margin adjustment */}
+    "))
+  )
+)
+
+
 ##### pick fish data: the checkboxes will control the data values plotted ######
-fish_controls <- function(species) {
-  filtered_columns <- grep(paste(species, collapse="|"), colnames(Both2), value = TRUE)
+fish_controls <- function(species, selected_vars, var_name) {
+  filtered_columns <- grep(paste(species, collapse = "|"), colnames(Both2), value = TRUE)
   sorted_filtered_columns <- sort(filtered_columns)
+  num_checkboxes <- length(sorted_filtered_columns)
+  
+  container_height <- ifelse(num_checkboxes <= 2, 45, 
+                             ifelse(num_checkboxes %% 2 == 0, 
+                                    45 + 25 * floor((num_checkboxes - 2) / 2), 
+                                    45 + 25 * floor((num_checkboxes) / 2)))
   
   controls <- list(
-    tags$div(align = 'left', 
-             class = 'multicol', 
-             checkboxGroupInput("variable", 
-                                label = NULL, 
-                                choiceNames  = sort(gsub("_", " ", sorted_filtered_columns), decreasing = FALSE),
-                                choiceValues = sorted_filtered_columns,
-                                selected = sorted_filtered_columns[1])
-    ) # close tags$div
-  ) # close list
+    tags$div(
+      align = 'left', 
+      class = 'multicol', 
+      style = paste0("border: 2px solid #E9E9E9; ", 
+                     "border-radius: 10px; ", 
+                     "padding: 10px; ", 
+                     "height: ", container_height, "px;", 
+                     "background-color: rgba(0, 0, 0, 0.2);"),  
+      checkboxGroupInput(
+        var_name, 
+        label = NULL, 
+        choiceNames = sort(gsub("_", " ", sorted_filtered_columns), decreasing = FALSE),
+        choiceValues = sorted_filtered_columns,
+        selected = sorted_filtered_columns[1]
+      )
+    ) 
+  )
   
   return(controls)
 }
-
 ##### controls2: year column included######
 controls2 <-
   list(h3("Select Environmental Variables"), 
@@ -57,7 +61,7 @@ controls2 <-
                                    selected = c("Year","Bottom_Temp_Anomaly_GOM",multiple = TRUE))
        )#close tags$div
   )#close list 
-###### finding name of second longest column (excluding NAs)
+###### finding name of second longest column (excluding NAs) ##############
 second_col<- function (df){
   m1 = sapply(df, function(x) sum(!is.na(x))) #find length of each column
   m2 = m1[-which.max(m1)] #find second longest column
@@ -179,3 +183,40 @@ Hometab<-tabItem(
     )
   )
 )#close tabitem
+####### Landing page content
+stripedbass_info<-tabPanel("Range & Info",
+         fluidRow(
+           column(width = 4,
+                  HTML('<div style="width: 100%; height: 400px; background-color: black; margin-top: 30px;"></div>')),
+           column(width = 8,
+                  h3("Overview"),
+                  p("Striped bass is an anadromous species native to the northeastern and central Atlantic coast of the United States and has a complex 
+                      life cycle involving spawning in coastal rivers and estuaries, followed by long-range migrations to feeding and overwintering 
+                      grounds. In Maine, striped bass fishing is a popular recreational activity, with the recreational harvest of striped bass routinely 
+                      surpassing that of the commercial harvest. Historically, striped bass spawned in numerous rivers along coastal New England, but now 
+                      rely on Chesapeake Bay and the Hudson River for the majority of spawning (Little 1995). Approximately 90% of the striped bass 
+                      population spawn in the Chesapeake Bay region (Little 1995). The striped bass fishery supports numerous shore-side businesses for 
+                      Maine’s economy, such as boat sales and rentals, bait and tackle shops, and fishing guide businesses. Striped bass landings are 
+                      dependent upon the migration timing and persistence in Maine waters, which have experienced changes associated with ocean warming 
+                      (Peer and Miller 2014; Secor et al. 2020). Changes in the timing and persistence of ecologically and economically important 
+                      migratory species such as striped bass can lead to implications to both the management of this species, as well as the economic 
+                      value of the fishery to the state.",
+                    style = "font-size: 18px;text-align: justify;"),
+                  h4("For more information, click the link below:", style = "padding-top: 40px;"),
+                  tags$li(HTML('<a href="C:/Users/jbehan/Box/Kerr Lab/Fisheries Science Lab/NCLIM/Indicator_Visualizations/Indicator_Visualizations2/papers_writeups/StripedBassliteraturereview.pdf" style="font-size: 18px;" target="_blank">Environmental Effects on Striped Bass Stock Dynamics</a>')
+                  ))))
+BFT_info<-tabPanel("Range & Info",
+                           fluidRow(
+                             column(width = 4,
+                                    HTML('<div style="width: 100%; height: 400px; background-color: black; margin-top: 30px;"></div>')),
+                             column(width = 8,
+                                    h3("Overview"),
+                                    p("Atlantic bluefin tuna (Thunnus thynnus) are a large, migratory species, managed by ICCAT as east (Mediterranean spawning)
+                                      and west (Gulf of Mexico spawning) stocks, with evidence of spawning activity in the Slope Sea off the Mid Atlantic Bight 
+                                      (Richardson et al. 2016a, Richardson et al. 2016b, Hernandez et al. 2022).Climate change impacts, such as warming, acidification, 
+                                      and changing ocean dynamics, are affecting their traditional spawning and feeding habitats, potentially leading to ecosystem 
+                                      and population productivity shifts in the North Atlantic and Mediterranean Sea",
+                                      style = "font-size: 18px;text-align: justify;"),
+                                    h4("For more information, click the link below:", style = "padding-top: 40px;"),
+                                    tags$li(HTML('<a href="C:/Users/jbehan/Box/Kerr Lab/Fisheries Science Lab/NCLIM/Indicator_Visualizations/Indicator_Visualizations2/papers_writeups/BFTliteraturereview.pdf" style="font-size: 18px;" target="_blank">Environmental Effects on Bluefin Tuna Stock Dynamics</a>')
+                                    ))))
