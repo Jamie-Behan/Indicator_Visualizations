@@ -40,7 +40,7 @@ ui <- dashboardPage(
                                       div(class = "fish-controls",fish_controls(c("Striped_Bass_Total_Abundance", "Striped_Bass_Commercial_Landings",
                                                                                   "Striped_Bass_Recreational_Landings", "Striped_Bass_Maine_Recreational_Harvest", "Striped_Bass_Full_F"),var_name="SB_other_variable")),
                                       radioButtons(
-                                        "Plotting_Style",
+                                        "SB_Plotting_Style",
                                         "Select Plotting Style",
                                         choices = c("Layered" = "Layered", "Stacked" = "Stacked"),
                                         selected = "Stacked"
@@ -61,7 +61,8 @@ ui <- dashboardPage(
                                     )),
                                   mainPanel(
                                     width = 12,
-                                    plotlyOutput("stripedbass_plot")
+                                    plotlyOutput("stripedbass_plot",
+                                                 height = "600px")
                                   ))))), #close tabitem
         tabItem(
           tabName = "BluefinTuna",
@@ -86,7 +87,7 @@ ui <- dashboardPage(
                                         #div(class = "fish-controls",fish_controls(c("Striped_Bass_Total_Abundance", "Striped_Bass_Commercial_Landings",
                                         #                                            "Striped_Bass_Recreational_Landings", "Striped_Bass_Maine_Recreational_Harvest", "Striped_Bass_Full_F"),var_name="BFT_other_variable")),
                                         radioButtons(
-                                          "Plotting_Style",
+                                          "BFT_Plotting_Style",
                                           "Select Plotting Style",
                                           choices = c("Layered" = "Layered", "Stacked" = "Stacked"),
                                           selected = "Stacked"
@@ -107,7 +108,8 @@ ui <- dashboardPage(
                                       )),
                                     mainPanel(
                                       width = 12,
-                                      plotlyOutput("BFT_plot"))
+                                      plotlyOutput(outputId = "BFT_plot",
+                                                   height = "600px"))
           ))#Tabpanel
                       )#main panel
         ), #close tabitem
@@ -133,7 +135,7 @@ server <- function(input, output, session) {
   output$stripedbass_plot <- renderPlotly({
     num_variables <- length(c(input$SB_recruitment_variable,input$SB_growth_variable,input$SB_other_variable, input$SB_Abiotic_variable,input$SB_Biotic_variable))
     all_vars<-c(input$SB_recruitment_variable,input$SB_growth_variable,input$SB_other_variable, input$SB_Abiotic_variable,input$SB_Biotic_variable)
-    if (input$Plotting_Style == "Layered") {
+    if (input$SB_Plotting_Style == "Layered") {
       
       if (num_variables > 4){ #plot 5 variables together
         plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
@@ -188,26 +190,28 @@ server <- function(input, output, session) {
       }}#close if layered option
     else {
       plot_list <- lapply(1:num_variables, function(i) {
+        # Use name_mapping to get the correct Yname for the variable
+        y_name <- name_mapping[all_vars[i]]
+        y_name2 <- name_mapping2[all_vars[i]]
+        
         plot_ly(dataDf(), x = ~Year, y = ~get(all_vars[i]), 
-                type = 'scatter', mode = 'lines', name = paste(all_vars[i]))
+                type = 'scatter', mode = 'lines', name = y_name) %>%
+          layout(yaxis = list(title = y_name2, side = 'left'))
       })
-      fig <- subplot(plot_list, nrows = num_variables, shareX = TRUE)
       
-      # Set y-axis label based on selected checkbox labels
-      y_labels <- all_vars
-      for (i in 1:num_variables) {
-        fig <- fig %>% layout(yaxis = list(title = y_labels[i]))
-      }
+      fig <- subplot(plot_list, nrows = num_variables, shareX = TRUE, titleY = TRUE, 
+                     titleX = TRUE, margin = 0.03)
       
       layout(fig, xaxis = list(title = "Year"),
              plot_bgcolor = '#e5ecf6', 
              xaxis2 = list(zerolinecolor = '#ffff', zerolinewidth = 2, gridcolor = 'ffff'), 
-             yaxis = list(zerolinecolor = '#ffff', zerolinewidth = 2, gridcolor = 'ffff'))}
+             yaxis = list(zerolinecolor = '#ffff', zerolinewidth = 2, gridcolor = 'ffff'))
+    }
   })#close renderPlotly
   output$BFT_plot <- renderPlotly({
     num_variables <- length(c(input$BFT_recruitment_variable,input$BFT_growth_variable,input$BFT_other_variable, input$BFT_Abiotic_variable,input$BFT_Biotic_variable))
     all_vars<-c(input$BFT_recruitment_variable,input$BFT_growth_variable,input$BFT_other_variable, input$BFT_Abiotic_variable,input$BFT_Biotic_variable)
-    if (input$Plotting_Style == "Layered") {
+    if (input$BFT_Plotting_Style == "Layered") {
       
       if (num_variables > 4){ #plot 5 variables together
         plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
@@ -262,21 +266,24 @@ server <- function(input, output, session) {
       }}#close if layered option
     else {
       plot_list <- lapply(1:num_variables, function(i) {
+        # Use name_mapping to get the correct Yname for the variable
+        y_name <- name_mapping[all_vars[i]]
+        y_name2 <- name_mapping2[all_vars[i]]
+        
         plot_ly(dataDf(), x = ~Year, y = ~get(all_vars[i]), 
-                type = 'scatter', mode = 'lines', name = paste(all_vars[i]))
+                type = 'scatter', mode = 'lines', name = y_name) %>%
+          layout(yaxis = list(title = y_name2, side = 'left'))
       })
-      fig <- subplot(plot_list, nrows = num_variables, shareX = TRUE)
       
-      # Set y-axis label based on selected checkbox labels
-      y_labels <- all_vars
-      for (i in 1:num_variables) {
-        fig <- fig %>% layout(yaxis = list(title = y_labels[i]))
-      }
+      fig <- subplot(plot_list, nrows = num_variables, shareX = TRUE, titleY = TRUE, 
+                     titleX = TRUE, margin = 0.03)
       
       layout(fig, xaxis = list(title = "Year"),
              plot_bgcolor = '#e5ecf6', 
              xaxis2 = list(zerolinecolor = '#ffff', zerolinewidth = 2, gridcolor = 'ffff'), 
-             yaxis = list(zerolinecolor = '#ffff', zerolinewidth = 2, gridcolor = 'ffff'))}
+             yaxis = list(zerolinecolor = '#ffff', zerolinewidth = 2, gridcolor = 'ffff'))
+    }
+    
   })#close renderPlotly
   output$lobster_plot <- renderPlotly({
     num_variables <- length(c(input$recruitment_variable,input$growth_variable,input$other_variable, input$Abiotic_variable,input$Biotic_variable))
