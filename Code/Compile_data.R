@@ -27,6 +27,9 @@ Both2 <- list(Both[1],Both2, stock_assess_data,DisMAPdata[c(1,2,3,8,9)])
 Both2 <-Reduce(function(x, y) merge(x, y, by="Year",all=T), Both2)
 Both2 <-Both2[rowSums(is.na(Both2)) != ncol(Both2), ] #removes rows containing all NAs
 #the Both2 df is the same as "Both", but is organized in alphabetical order
+Both2 <-as.data.frame(lapply(Both2, function(x) { #make sure each column is classified as numeric instead of character
+  as.numeric(as.character(x))
+}))
 
 uniquecolnames <- unique(gsub("_[^_]+$", "", names(Both2)[-1])) #get unique column names excluding year
 
