@@ -220,3 +220,59 @@ BFT_info<-tabPanel("Range & Info",
                                     h4("For more information, click the link below:", style = "padding-top: 40px;"),
                                     tags$li(HTML('<a href="C:/Users/jbehan/Box/Kerr Lab/Fisheries Science Lab/NCLIM/Indicator_Visualizations/Indicator_Visualizations2/papers_writeups/BFTliteraturereview.pdf" style="font-size: 18px;" target="_blank">Environmental Effects on Bluefin Tuna Stock Dynamics</a>')
                                     ))))
+###### New DF to help classify data for use in creating appropriate plot Y-axis labels #######
+# Create an empty dataframe with columns "Data_name" and "Data_type"
+new_df <- data.frame(Data_name = character(0), Data_type = character(0), stringsAsFactors = FALSE)
+
+# Iterate through each column in Both2 dataframe
+for (col_name in colnames(Both2)) {
+  data_values <- Both2[[col_name]]
+  
+  # Remove NA values from data
+  filtered_data <- data_values[!is.na(data_values)]
+  
+  # Check if there are any remaining non-NA values
+  if (length(filtered_data) > 0) {
+    # Check conditions and classify the data type
+    if (all(filtered_data >= -15 & filtered_data <= 15)) {
+      data_type <- "Anomaly"
+    } else if (grepl("Lat", col_name, ignore.case = TRUE)) {
+      data_type <- "Latitude"
+    } else if (all(filtered_data >= 0) && any(filtered_data > 1000)) {
+      data_type <- "Biomass"
+    } else if (grepl("Depth", col_name, ignore.case = TRUE)) {
+      data_type <- "Depth"
+    } else {
+      data_type <- "Other"
+    }
+  } else {
+    data_type <- "Other"  # If there are no valid values, classify as "Other"
+  }
+  # Extract Yname based on Data_name
+  y_name <- gsub("_", " ", col_name)
+  y_name <- gsub("\\b(MAB|COG|Mean|ALL|GOM|Annual|Absolute|Anomaly)\\b", "", y_name, ignore.case = TRUE)  # Remove specified words
+  
+  # Modify Yname based on additional conditions for Yname2
+  y_name2 <- gsub("\\b(Atlantic|River|American|Landings|Striped Bass|lobster)\\b", "", y_name)
+  y_name2 <- gsub("\\bAbundance\\b", "Abun.", y_name2)
+  y_name2 <- gsub("\\bCommercial\\b", "Comm.", y_name2)
+  y_name2 <- gsub("\\bRecreational\\b", "Rec.", y_name2)
+  y_name2 <- gsub("\\bFall\\b", "FL", y_name2)
+  y_name2 <- gsub("\\bSpring\\b", "SP", y_name2)
+  y_name2 <- gsub("\\bherring\\b", "Herring", y_name2, ignore.case = TRUE)
+  # Remove leading and trailing spaces, and reduce multiple spaces to a single space
+  y_name2 <- gsub("^\\s+|\\s+$", "", y_name2)  # Remove leading and trailing spaces
+  y_name2 <- gsub("\\s+", " ", y_name2)  # Reduce multiple spaces to a single space
+  
+  # Add a new row to the new dataframe
+  new_df <- rbind(new_df, data.frame(Data_name = col_name, Data_type = data_type, Yname = y_name, Yname2 = y_name2, stringsAsFactors = FALSE))
+}
+# Create a named vector mapping Data_name to Yname
+name_mapping <- setNames(new_df$Yname, new_df$Data_name)
+name_mapping2 <- setNames(new_df$Yname2, new_df$Data_name)
+################ Create a new dataframe "Both3" by rounding the values in "Both2" to 2 decimal places ####################
+Both3 <- as.data.frame(lapply(Both2, function(x) {
+  as.numeric(as.character(x))
+}))
+# Round all columns to 2 decimal places
+Both3[] <- lapply(Both3, function(x) round(x, 2))
