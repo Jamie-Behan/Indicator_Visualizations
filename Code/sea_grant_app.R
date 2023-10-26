@@ -42,7 +42,7 @@ ui <- dashboardPage(
                                       radioButtons(
                                         "SB_Plotting_Style",
                                         "Select Plotting Style",
-                                        choices = c("Layered" = "Layered", "Stacked" = "Stacked"),
+                                        choices = c("Layered (Choose up to 5 Variables)" = "Layered", "Stacked" = "Stacked"),
                                         selected = "Stacked"
                                       )
                                     ),
@@ -62,7 +62,7 @@ ui <- dashboardPage(
                                   mainPanel(
                                     width = 12,
                                     plotlyOutput("stripedbass_plot",
-                                                 height = "600px")
+                                                 height = "650px")
                                   ))))), #close tabitem
         tabItem(
           tabName = "BluefinTuna",
@@ -89,7 +89,7 @@ ui <- dashboardPage(
                                         radioButtons(
                                           "BFT_Plotting_Style",
                                           "Select Plotting Style",
-                                          choices = c("Layered" = "Layered", "Stacked" = "Stacked"),
+                                          choices = c("Layered (Choose up to 5 Variables)" = "Layered", "Stacked" = "Stacked"),
                                           selected = "Stacked"
                                         )
                                       ),
@@ -109,7 +109,7 @@ ui <- dashboardPage(
                                     mainPanel(
                                       width = 12,
                                       plotlyOutput(outputId = "BFT_plot",
-                                                   height = "600px"))
+                                                   height = "650px"))
           ))#Tabpanel
                       )#main panel
         ), #close tabitem
@@ -117,8 +117,49 @@ ui <- dashboardPage(
           tabName = "AmericanLobster",
           h2(
             img(src = "https://www.fisheries.noaa.gov/s3/styles/original/s3/dam-migration/640x427-american-lobster.png?itok=FX0oMipE", style = "width: 250px; height: auto; vertical-align: middle; margin-right: 10px;"),
-            HTML('<strong style="font-size: 40px;">American Lobster</strong> (<em>Homarus americanus</em>)')
-          )), #close tabitem
+            HTML('<strong style="font-size: 40px;">American Lobster</strong> (<em>Homarus americanus</em>)')),
+            mainPanel(width = 12,
+                      tabsetPanel(type = "tabs",
+                                  AL_info, #text that shows up on info page for lobster tab. code located in "supporting_functions_for_app.R"
+                                  tabPanel(
+                                    "Interactive Plots",
+                                    h2("Choose Stock and Environmental Variables", style = "font-weight: bold;"),
+                                    fluidRow(
+                                      column(
+                                        width = 6,
+                                        h3("Stock Variables", style = "font-weight: bold;"),
+                                        h4("Variables related to recruitment", style = "font-weight: bold;"),
+                                        #div(class = "fish-controls",fish_controls(c("Striped_Bass_Age1_Abundance", "Striped_Bass_Female_SSB"),var_name="AL_recruitment_variable")),
+                                        h4("Variables related to Distribution", style = "font-weight: bold;"),
+                                        div(class = "fish-controls",fish_controls(c("American_lobster_Fall_Lat_COG","American_lobster_Spring_Lat_COG","American_lobster_Fall_Depth_COG","American_lobster_Spring_Depth_COG"),var_name="AL_distribution_variable")),
+                                        h4("Other variables", style = "font-weight: bold;"),
+                                        #div(class = "fish-controls",fish_controls(c("Striped_Bass_Total_Abundance", "Striped_Bass_Commercial_Landings",
+                                        #                                            "Striped_Bass_Recreational_Landings", "Striped_Bass_Maine_Recreational_Harvest", "Striped_Bass_Full_F"),var_name="AL_other_variable")),
+                                        radioButtons(
+                                          "AL_Plotting_Style",
+                                          "Select Plotting Style",
+                                          choices = c("Layered (Choose up to 5 Variables)" = "Layered", "Stacked" = "Stacked"),
+                                          selected = "Stacked"
+                                        )
+                                      ),
+                                      column(
+                                        width = 6,
+                                        h3("Environmental Variables", style = "font-weight: bold;"),
+                                        h4("Abiotic", style = "font-weight: bold;"),
+                                        div(class = "fish-controls",fish_controls(c("Annual_Bottom_Temp_Absolute_GOM","SST_Temp_Anomaly_GOM",
+                                                                                    "Bottom_Temp_Anomaly_GOM","GLORYS_Bottom_Temp_Anomaly_GOM"),var_name="AL_Abiotic_variable")),
+                                        h4("Biotic", style = "font-weight: bold;"),
+                                        div(class = "fish-controls",fish_controls(c("Annual_Forage_Fish_Biomass_GOM",
+                                                                                    "Atlantic_herring_Fall_Depth_COG","Atlantic_herring_Fall_Lat_COG","Atlantic_herring_Spring_Depth_COG",   
+                                                                                    "Atlantic_herring_Spring_Lat_COG"),var_name="AL_Biotic_variable"))
+                                      )),
+                                    mainPanel(
+                                      width = 12,
+                                      plotlyOutput(outputId = "AL_plot",
+                                                   height = "650px"))
+                                  ))#Tabpanel
+            )#main panel
+          ), #close tabitem
         ####Source metadata code ####
         source(here("Code/app_metadata.R"), local = TRUE)$value
       )#close tabItems
@@ -135,229 +176,17 @@ server <- function(input, output, session) {
   output$stripedbass_plot <- renderPlotly({
     num_variables <- length(c(input$SB_recruitment_variable,input$SB_growth_variable,input$SB_other_variable, input$SB_Abiotic_variable,input$SB_Biotic_variable))
     all_vars<-c(input$SB_recruitment_variable,input$SB_growth_variable,input$SB_other_variable, input$SB_Abiotic_variable,input$SB_Biotic_variable)
-    if (input$SB_Plotting_Style == "Layered") {
-      
-      if (num_variables > 4){ #plot 5 variables together
-        plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
-                type = 'scatter', mode = 'lines', name = paste(all_vars[1])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[2]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[2])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[3]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[3])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[4]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[4])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[5]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[5])) %>%
-          layout(xaxis = list(title = "Year"))
-      } else if (num_variables == 4){ #if only 4 variables are chosen
-        plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
-                type = 'scatter', mode = 'lines', name = paste(all_vars[1])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[2]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[2])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[3]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[3])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[4]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[4])) %>%
-          layout(xaxis = list(title = "Year"))
-      } else if (num_variables == 3){ #if only 3 variables are chosen
-        plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
-                type = 'scatter', mode = 'lines', name = paste(all_vars[1])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[2]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[2])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[3]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[3])) %>%
-          layout(xaxis = list(title = "Year"))
-      } else if (num_variables > 1){ #if only 2 variables are chosen
-        plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
-                type = 'scatter', mode = 'lines', name = paste(all_vars[1])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[2]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[2])) %>%
-          layout(xaxis = list(title = "Year"))
-      } else { #plot individually if only 1 is selected
-        fig1<- plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
-                       type = 'scatter', mode = 'lines', name = paste(all_vars[1]))
-        fig<-subplot(fig1, nrows = 1) %>% 
-          layout(xaxis = list(title = "Year"),
-                 xaxis = list( 
-                   zerolinecolor = '#ffff', 
-                   zerolinewidth = 2, 
-                   gridcolor = 'ffff'), 
-                 yaxis = list( 
-                   zerolinecolor = '#ffff', 
-                   zerolinewidth = 2, 
-                   gridcolor = 'ffff'))
-        fig
-      }}#close if layered option
-    else {
-      plot_list <- lapply(1:num_variables, function(i) {
-        # Use name_mapping to get the correct Yname for the variable
-        y_name <- name_mapping[all_vars[i]]
-        y_name2 <- name_mapping2[all_vars[i]]
-        
-        plot_ly(dataDf(), x = ~Year, y = ~get(all_vars[i]), 
-                type = 'scatter', mode = 'lines', name = y_name) %>%
-          layout(yaxis = list(title = y_name2, side = 'left'))
-      })
-      
-      fig <- subplot(plot_list, nrows = num_variables, shareX = TRUE, titleY = TRUE, 
-                     titleX = TRUE, margin = 0.03)
-      
-      layout(fig, xaxis = list(title = "Year"),
-             plot_bgcolor = '#e5ecf6', 
-             xaxis2 = list(zerolinecolor = '#ffff', zerolinewidth = 2, gridcolor = 'ffff'), 
-             yaxis = list(zerolinecolor = '#ffff', zerolinewidth = 2, gridcolor = 'ffff'))
-    }
+    plot_function(plottingstyle = input$SB_Plotting_Style,num_variables=num_variables, dataDf=dataDf, all_vars=all_vars, name_mapping=name_mapping, name_mapping2=name_mapping2)
   })#close renderPlotly
   output$BFT_plot <- renderPlotly({
     num_variables <- length(c(input$BFT_recruitment_variable,input$BFT_growth_variable,input$BFT_other_variable, input$BFT_Abiotic_variable,input$BFT_Biotic_variable))
     all_vars<-c(input$BFT_recruitment_variable,input$BFT_growth_variable,input$BFT_other_variable, input$BFT_Abiotic_variable,input$BFT_Biotic_variable)
-    if (input$BFT_Plotting_Style == "Layered") {
-      
-      if (num_variables > 4){ #plot 5 variables together
-        plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
-                type = 'scatter', mode = 'lines', name = paste(all_vars[1])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[2]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[2])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[3]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[3])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[4]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[4])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[5]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[5])) %>%
-          layout(xaxis = list(title = "Year"))
-      } else if (num_variables == 4){ #if only 4 variables are chosen
-        plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
-                type = 'scatter', mode = 'lines', name = paste(all_vars[1])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[2]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[2])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[3]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[3])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[4]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[4])) %>%
-          layout(xaxis = list(title = "Year"))
-      } else if (num_variables == 3){ #if only 3 variables are chosen
-        plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
-                type = 'scatter', mode = 'lines', name = paste(all_vars[1])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[2]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[2])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[3]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[3])) %>%
-          layout(xaxis = list(title = "Year"))
-      } else if (num_variables > 1){ #if only 2 variables are chosen
-        plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
-                type = 'scatter', mode = 'lines', name = paste(all_vars[1])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[2]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[2])) %>%
-          layout(xaxis = list(title = "Year"))
-      } else { #plot individually if only 1 is selected
-        fig1<- plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
-                       type = 'scatter', mode = 'lines', name = paste(all_vars[1]))
-        fig<-subplot(fig1, nrows = 1) %>% 
-          layout(xaxis = list(title = "Year"),
-                 xaxis = list( 
-                   zerolinecolor = '#ffff', 
-                   zerolinewidth = 2, 
-                   gridcolor = 'ffff'), 
-                 yaxis = list( 
-                   zerolinecolor = '#ffff', 
-                   zerolinewidth = 2, 
-                   gridcolor = 'ffff'))
-        fig
-      }}#close if layered option
-    else {
-      plot_list <- lapply(1:num_variables, function(i) {
-        # Use name_mapping to get the correct Yname for the variable
-        y_name <- name_mapping[all_vars[i]]
-        y_name2 <- name_mapping2[all_vars[i]]
-        
-        plot_ly(dataDf(), x = ~Year, y = ~get(all_vars[i]), 
-                type = 'scatter', mode = 'lines', name = y_name) %>%
-          layout(yaxis = list(title = y_name2, side = 'left'))
-      })
-      
-      fig <- subplot(plot_list, nrows = num_variables, shareX = TRUE, titleY = TRUE, 
-                     titleX = TRUE, margin = 0.03)
-      
-      layout(fig, xaxis = list(title = "Year"),
-             plot_bgcolor = '#e5ecf6', 
-             xaxis2 = list(zerolinecolor = '#ffff', zerolinewidth = 2, gridcolor = 'ffff'), 
-             yaxis = list(zerolinecolor = '#ffff', zerolinewidth = 2, gridcolor = 'ffff'))
-    }
-    
+    plot_function(plottingstyle = input$BFT_Plotting_Style,num_variables=num_variables, dataDf=dataDf, all_vars=all_vars, name_mapping=name_mapping, name_mapping2=name_mapping2)
   })#close renderPlotly
-  output$lobster_plot <- renderPlotly({
-    num_variables <- length(c(input$recruitment_variable,input$growth_variable,input$other_variable, input$Abiotic_variable,input$Biotic_variable))
-    all_vars<-c(input$recruitment_variable,input$growth_variable,input$other_variable, input$Abiotic_variable,input$Biotic_variable)
-    if (input$Plotting_Style == "Layered") {
-      
-      if (num_variables > 4){ #plot 5 variables together
-        plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
-                type = 'scatter', mode = 'lines', name = paste(all_vars[1])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[2]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[2])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[3]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[3])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[4]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[4])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[5]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[5])) %>%
-          layout(xaxis = list(title = "Year"))
-      } else if (num_variables == 4){ #if only 4 variables are chosen
-        plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
-                type = 'scatter', mode = 'lines', name = paste(all_vars[1])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[2]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[2])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[3]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[3])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[4]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[4])) %>%
-          layout(xaxis = list(title = "Year"))
-      } else if (num_variables == 3){ #if only 3 variables are chosen
-        plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
-                type = 'scatter', mode = 'lines', name = paste(all_vars[1])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[2]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[2])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[3]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[3])) %>%
-          layout(xaxis = list(title = "Year"))
-      } else if (num_variables > 1){ #if only 2 variables are chosen
-        plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
-                type = 'scatter', mode = 'lines', name = paste(all_vars[1])) %>%
-          add_trace(dataDf(), x = ~Year, y = ~get(all_vars[2]), 
-                    type = 'scatter', mode = 'lines',name = paste(all_vars[2])) %>%
-          layout(xaxis = list(title = "Year"))
-      } else { #plot individually if only 1 is selected
-        fig1<- plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
-                       type = 'scatter', mode = 'lines', name = paste(all_vars[1]))
-        fig<-subplot(fig1, nrows = 1) %>% 
-          layout(xaxis = list(title = "Year"),
-                 xaxis = list( 
-                   zerolinecolor = '#ffff', 
-                   zerolinewidth = 2, 
-                   gridcolor = 'ffff'), 
-                 yaxis = list( 
-                   zerolinecolor = '#ffff', 
-                   zerolinewidth = 2, 
-                   gridcolor = 'ffff'))
-        fig
-      }}#close if layered option
-    else {
-      plot_list <- lapply(1:num_variables, function(i) {
-        plot_ly(dataDf(), x = ~Year, y = ~get(all_vars[i]), 
-                type = 'scatter', mode = 'lines', name = paste(all_vars[i]))
-      })
-      fig <- subplot(plot_list, nrows = num_variables, shareX = TRUE)
-      
-      # Set y-axis label based on selected checkbox labels
-      y_labels <- all_vars
-      for (i in 1:num_variables) {
-        fig <- fig %>% layout(yaxis = list(title = y_labels[i]))
-      }
-      
-      layout(fig, xaxis = list(title = "Year"),
-             plot_bgcolor = '#e5ecf6', 
-             xaxis2 = list(zerolinecolor = '#ffff', zerolinewidth = 2, gridcolor = 'ffff'), 
-             yaxis = list(zerolinecolor = '#ffff', zerolinewidth = 2, gridcolor = 'ffff'))}
+  output$AL_plot <- renderPlotly({
+    num_variables <- length(c(input$AL_recruitment_variable,input$AL_distribution_variable,input$AL_other_variable, input$AL_Abiotic_variable,input$AL_Biotic_variable))
+    all_vars<-c(input$AL_recruitment_variable,input$AL_distribution_variable,input$AL_other_variable, input$AL_Abiotic_variable,input$AL_Biotic_variable)
+    plot_function(plottingstyle = input$AL_Plotting_Style,num_variables=num_variables, dataDf=dataDf, all_vars=all_vars, name_mapping=name_mapping, name_mapping2=name_mapping2)
   })#close renderPlotly
 } # server
 
