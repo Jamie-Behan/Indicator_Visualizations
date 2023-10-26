@@ -63,7 +63,14 @@ ui <- dashboardPage(
                                     width = 12,
                                     plotlyOutput("stripedbass_plot",
                                                  height = "650px")
-                                  ))))), #close tabitem
+                                  )),
+                                tabPanel("Data", 
+                                  mainPanel(width = 12,
+                                            DT::dataTableOutput("mytable_SB"),
+                                            downloadButton("downloadCSV_SB", "Download .CSV"))
+                                )
+
+                                ))), #close tabitem
         tabItem(
           tabName = "BluefinTuna",
           h2(
@@ -108,11 +115,16 @@ ui <- dashboardPage(
                                       )),
                                     mainPanel(
                                       width = 12,
-                                      plotlyOutput(outputId = "BFT_plot",
-                                                   height = "650px"))
-          ))#Tabpanel
-                      )#main panel
-        ), #close tabitem
+                                      plotlyOutput("BFT_plot",
+                                                   height = "650px")
+                                    )),
+                                  tabPanel("Data", 
+                                           mainPanel(width = 12,
+                                                     DT::dataTableOutput("mytable_BFT"),
+                                           downloadButton("downloadCSV_BFT", "Download .CSV"))
+                                  )
+                                  
+                      ))), #close tabitem
         tabItem(
           tabName = "AmericanLobster",
           h2(
@@ -155,11 +167,16 @@ ui <- dashboardPage(
                                       )),
                                     mainPanel(
                                       width = 12,
-                                      plotlyOutput(outputId = "AL_plot",
-                                                   height = "650px"))
-                                  ))#Tabpanel
-            )#main panel
-          ), #close tabitem
+                                      plotlyOutput("AL_plot",
+                                                   height = "650px")
+                                    )),
+                                  tabPanel("Data", 
+                                           mainPanel(width = 12,
+                                                     DT::dataTableOutput("mytable_AL"),
+                                           downloadButton("downloadCSV_AL", "Download .CSV"))
+                                  )
+                                  
+                      ))), #close tabitem
         ####Source metadata code ####
         source(here("Code/app_metadata.R"), local = TRUE)$value
       )#close tabItems
@@ -188,6 +205,43 @@ server <- function(input, output, session) {
     all_vars<-c(input$AL_recruitment_variable,input$AL_distribution_variable,input$AL_other_variable, input$AL_Abiotic_variable,input$AL_Biotic_variable)
     plot_function(plottingstyle = input$AL_Plotting_Style,num_variables=num_variables, dataDf=dataDf, all_vars=all_vars, name_mapping=name_mapping, name_mapping2=name_mapping2)
   })#close renderPlotly
+  
+  output$mytable_SB <- DT::renderDataTable({
+    all_varsY <- c("Year", input$SB_recruitment_variable, input$SB_growth_variable, input$SB_other_variable, input$SB_Abiotic_variable, input$SB_Biotic_variable)
+    datatable_function(all_varsY=all_varsY)
+  })
+  output$mytable_BFT <- DT::renderDataTable({
+    all_varsY <- c("Year", input$BFT_recruitment_variable,input$BFT_growth_variable,input$BFT_other_variable, input$BFT_Abiotic_variable,input$BFT_Biotic_variable)
+    datatable_function(all_varsY=all_varsY)
+  })
+  output$mytable_AL <- DT::renderDataTable({
+    all_varsY <- c("Year", input$AL_recruitment_variable,input$AL_distribution_variable,input$AL_other_variable, input$AL_Abiotic_variable,input$AL_Biotic_variable)
+    datatable_function(all_varsY=all_varsY)
+  })
+  output$downloadCSV_SB <- downloadHandler(
+    filename = function() {
+      paste("Stripedbass_indicator_data", Sys.Date(), ".csv", sep = "")
+    },
+    content = function(file) {
+      write.csv(table_subset, file)
+    }
+  )
+  output$downloadCSV_BFT <- downloadHandler(
+    filename = function() {
+      paste("Bluefin_indicator_data", Sys.Date(), ".csv", sep = "")
+    },
+    content = function(file) {
+      write.csv(table_subset, file)
+    }
+  )
+  output$downloadCSV_AL <- downloadHandler(
+    filename = function() {
+      paste("Lobster_indicator_data", Sys.Date(), ".csv", sep = "")
+    },
+    content = function(file) {
+      write.csv(table_subset, file)
+    }
+  )
 } # server
 
 # Create Shiny object
