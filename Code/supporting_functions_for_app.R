@@ -21,12 +21,18 @@ fish_controls <- function(species, selected_vars, var_name) {
   filtered_columns <- grep(paste(species, collapse = "|"), colnames(Both2), value = TRUE)
   sorted_filtered_columns <- sort(filtered_columns)
   num_checkboxes <- length(sorted_filtered_columns)
+  conditionNames<- gsub("_", " ", filtered_columns)
+  conditionNames<- gsub("\\b(MAB|COG|ALL|GOM)\\b", "", conditionNames, ignore.case = TRUE)  # Remove specified words
+  conditionNames<- gsub("^\\s+|\\s+$", "", conditionNames)  # Remove leading and trailing spaces
+  conditionNames<- gsub("\\s+", " ", conditionNames) # Reduce multiple spaces to a single space
+  conditionNames<- gsub("\\bLat\\b", "Latitude", conditionNames) #Write out Latitude fully
+  conditionNames<- gsub("\\bCalfin anomaly\\b", "C. finmarchicus Anomaly", conditionNames) #Write out recognizable calanus abbreviation
+
   
   container_height <- ifelse(num_checkboxes <= 2, 45, 
                              ifelse(num_checkboxes %% 2 == 0, 
                                     45 + 25 * floor((num_checkboxes - 2) / 2), 
                                     45 + 25 * floor((num_checkboxes) / 2)))
-  
   controls <- list(
     tags$div(
       align = 'left', 
@@ -38,8 +44,9 @@ fish_controls <- function(species, selected_vars, var_name) {
                      "background-color: rgba(0, 0, 0, 0.2);"),  
       checkboxGroupInput(
         var_name, 
-        label = NULL, 
-        choiceNames = sort(gsub("_", " ", sorted_filtered_columns), decreasing = FALSE),
+        label = NULL,
+        choiceNames = sort(conditionNames, decreasing = FALSE),
+        #choiceNames = sort(sorted_filtered_columns, decreasing = FALSE),
         choiceValues = sorted_filtered_columns,
         selected = sorted_filtered_columns[1]
       )
@@ -48,19 +55,6 @@ fish_controls <- function(species, selected_vars, var_name) {
   
   return(controls)
 }
-##### controls2: year column included######
-controls2 <-
-  list(h3("Select Environmental Variables"), 
-       tags$div(align = 'left', 
-                class = 'multicol', 
-                checkboxGroupInput("show_vars", 
-                                   label = NULL, 
-                                   choiceNames  = gsub("_", " ", colnames(Both2[1:23])), ##select columns on env data only
-                                   
-                                   choiceValues = colnames(Both2[1:23]), ##select columns on env data only 
-                                   selected = c("Year","Bottom_Temp_Anomaly_GOM",multiple = TRUE))
-       )#close tags$div
-  )#close list 
 ###### finding name of second longest column (excluding NAs) ##############
 second_col<- function (df){
   m1 = sapply(df, function(x) sum(!is.na(x))) #find length of each column
@@ -81,15 +75,16 @@ sidebar <- dashboardSidebar(width = 150,
                               menuItem("American Lobster", tabName = "AmericanLobster",icon = icon("fish")),
                               menuItem("Metadata", tabName = "Metadata",icon = icon("list"))
                               
-                            ),
-                            HTML(paste0(
-                              "<div style='margin-top: 100px; text-align: center;'>",
-                              "<a href='https://github.com/Jamie-Behan' target='_blank'>", 
-                              icon("github", class = "fa-3x"), 
-                              "<br/>Jamie Behan 2023",
-                              "</a>",
-                              "</div>"
-                            ))
+                            )
+                            #,
+#                            HTML(paste0(
+#                              "<div style='margin-top: 100px; text-align: center;'>",
+#                              "<a href='https://github.com/Jamie-Behan' target='_blank'>", 
+ #                             icon("github", class = "fa-3x"), 
+#                              "<br/>Jamie Behan 2023",
+#                              "</a>",
+#                              "</div>"
+#                            ))
 )
 ######## define colors#####
 gmri_colors<-tags$head(tags$style(HTML('
@@ -183,7 +178,7 @@ Hometab<-tabItem(
     )
   )
 )#close tabitem
-####### Landing page content
+####### Species Landing page content #######
 stripedbass_info<-tabPanel("Range & Info",
          fluidRow(
            column(width = 4,
@@ -220,6 +215,24 @@ BFT_info<-tabPanel("Range & Info",
                                     h4("For more information, click the link below:", style = "padding-top: 40px;"),
                                     tags$li(HTML('<a href="C:/Users/jbehan/Box/Kerr Lab/Fisheries Science Lab/NCLIM/Indicator_Visualizations/Indicator_Visualizations2/papers_writeups/BFTliteraturereview.pdf" style="font-size: 18px;" target="_blank">Environmental Effects on Bluefin Tuna Stock Dynamics</a>')
                                     ))))
+AL_info<-tabPanel("Range & Info",
+                   fluidRow(
+                     column(width = 4,
+                            HTML('<div style="width: 100%; height: 400px; background-color: black; margin-top: 30px;"></div>')),
+                     column(width = 8,
+                            h3("Overview"),
+                            p("American Lobster (Homarus americanus) is a benthic crustacean whose range extends along the Atlantic coast from the Mid-Atlantic region of the US to 
+                              Newfoundland, Canada (Waddy & Aiken, 1986), and supports one of the most lucrative fisheries in this region. In 2021, commercial landings reached a 
+                              record-high value of 134 million pounds and an ex-vessel value of approximately $875 million (ASFMC, 2021). The Gulf of Maine (GOM) and Georges Bank 
+                              (GB) stocks contribute over 90% of US lobster landings (ASMFC, 2020) and while these stocks are not currently overfished (ASMFC, 2020), environmental 
+                              factors, such as water temperature, salinity, substrate type, depth, distance from shore, and the presence of shelter, influence the distribution and 
+                              abundance of lobster populations. American lobsters have a recognized temperature preference between 12 and 18°C (Crossin et al., 1998) and a salinity 
+                              preference between 20–32 ppt (Jury et al. 1994; Tanaka and Chen, 2015). Although substrate and habitat preferences vary by life stage, lobsters have 
+                              been observed in diverse habitats including cobble, rock, mud, bedrock, sand, peat reefs, and eelgrass beds (Lawton and Lavalli, 1995).",
+                              style = "font-size: 18px;text-align: justify;"),
+                            h4("For more information, click the link below:", style = "padding-top: 40px;"),
+                            tags$li(HTML('<a href="C:/Users/jbehan/Box/Kerr Lab/Fisheries Science Lab/NCLIM/Indicator_Visualizations/Indicator_Visualizations2/papers_writeups/AMliteraturereview.pdf" style="font-size: 18px;" target="_blank">Environmental Effects on American Lobster Stock Dynamics</a>')
+                            ))))
 ###### New DF to help classify data for use in creating appropriate plot Y-axis labels #######
 # Create an empty dataframe with columns "Data_name" and "Data_type"
 new_df <- data.frame(Data_name = character(0), Data_type = character(0), stringsAsFactors = FALSE)
@@ -250,17 +263,24 @@ for (col_name in colnames(Both2)) {
   }
   # Extract Yname based on Data_name
   y_name <- gsub("_", " ", col_name)
-  y_name <- gsub("\\b(MAB|COG|Mean|ALL|GOM|Annual|Absolute|Anomaly)\\b", "", y_name, ignore.case = TRUE)  # Remove specified words
+  y_name <- gsub("\\b(MAB|COG|Mean|ALL|GOM|Annual)\\b", "", y_name, ignore.case = TRUE)  # Remove specified words
+  y_name <- gsub("^\\s+|\\s+$", "", y_name)  # Remove leading and trailing spaces
+  y_name <- gsub("\\s+", " ", y_name)  # Reduce multiple spaces to a single space
   
   # Modify Yname based on additional conditions for Yname2
-  y_name2 <- gsub("\\b(Atlantic|River|American|Landings|Striped Bass|lobster)\\b", "", y_name)
+  y_name2 <- gsub("\\b(Atlantic|River|American|Landings|Striped Bass|lobster|Biomass)\\b", "", y_name)
   y_name2 <- gsub("\\bAbundance\\b", "Abun.", y_name2)
   y_name2 <- gsub("\\bCommercial\\b", "Comm.", y_name2)
   y_name2 <- gsub("\\bRecreational\\b", "Rec.", y_name2)
   y_name2 <- gsub("\\bFall\\b", "FL", y_name2)
   y_name2 <- gsub("\\bSpring\\b", "SP", y_name2)
+  y_name2 <- gsub("\\bCopepods\\b", "Copepod", y_name2)
+  y_name2 <- gsub("\\bBottom Temp\\b", "bt", y_name2)
+  y_name2 <- gsub("\\bAnomaly\\b", "", y_name2)
+  y_name2 <- gsub("\\bAbsolute\\b", "Abs.", y_name2)
+  y_name2 <- gsub("\\bLarge\\b", "Lg", y_name2)
+  y_name2 <- gsub("\\bSmall\\b", "Sm", y_name2)
   y_name2 <- gsub("\\bherring\\b", "Herring", y_name2, ignore.case = TRUE)
-  # Remove leading and trailing spaces, and reduce multiple spaces to a single space
   y_name2 <- gsub("^\\s+|\\s+$", "", y_name2)  # Remove leading and trailing spaces
   y_name2 <- gsub("\\s+", " ", y_name2)  # Reduce multiple spaces to a single space
   
@@ -270,9 +290,103 @@ for (col_name in colnames(Both2)) {
 # Create a named vector mapping Data_name to Yname
 name_mapping <- setNames(new_df$Yname, new_df$Data_name)
 name_mapping2 <- setNames(new_df$Yname2, new_df$Data_name)
-################ Create a new dataframe "Both3" by rounding the values in "Both2" to 2 decimal places ####################
-Both3 <- as.data.frame(lapply(Both2, function(x) {
-  as.numeric(as.character(x))
-}))
-# Round all columns to 2 decimal places
-Both3[] <- lapply(Both3, function(x) round(x, 2))
+################ plotly function for stacked/layered plots ####################
+plot_function<-function(plottingstyle,num_variables=num_variables, dataDf=dataDf, all_vars=all_vars, name_mapping=name_mapping, name_mapping2=name_mapping2){
+  if (plottingstyle == "Layered") {
+    
+    if (num_variables > 4){ #plot 5 variables together
+      plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
+              type = 'scatter', mode = 'lines', name =name_mapping[all_vars[1]]) %>%
+        add_trace(dataDf(), x = ~Year, y = ~get(all_vars[2]), 
+                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[2]]) %>%
+        add_trace(dataDf(), x = ~Year, y = ~get(all_vars[3]), 
+                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[3]]) %>%
+        add_trace(dataDf(), x = ~Year, y = ~get(all_vars[4]), 
+                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[4]]) %>%
+        add_trace(dataDf(), x = ~Year, y = ~get(all_vars[5]), 
+                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[5]]) %>%
+        layout(xaxis = list(title = "Year",
+                            zerolinecolor = '#bdbdbd', 
+                            zerolinewidth = 2,
+                            showgrid = FALSE), 
+               yaxis = list(title="",  
+                            zerolinecolor = '#bdbdbd', 
+                            zerolinewidth = 2,
+                            showgrid = FALSE))
+    } else if (num_variables == 4){ #if only 4 variables are chosen
+      plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
+              type = 'scatter', mode = 'lines', name =name_mapping[all_vars[1]]) %>%
+        add_trace(dataDf(), x = ~Year, y = ~get(all_vars[2]), 
+                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[2]]) %>%
+        add_trace(dataDf(), x = ~Year, y = ~get(all_vars[3]), 
+                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[3]]) %>%
+        add_trace(dataDf(), x = ~Year, y = ~get(all_vars[4]), 
+                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[4]]) %>%
+        layout(xaxis = list(title = "Year",
+                            zerolinecolor = '#bdbdbd', 
+                            zerolinewidth = 2,
+                            showgrid = FALSE), 
+               yaxis = list(title="",  
+                            zerolinecolor = '#bdbdbd', 
+                            zerolinewidth = 2,
+                            showgrid = FALSE))
+    } else if (num_variables == 3){ #if only 3 variables are chosen
+      plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
+              type = 'scatter', mode = 'lines', name =name_mapping[all_vars[1]]) %>%
+        add_trace(dataDf(), x = ~Year, y = ~get(all_vars[2]), 
+                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[2]]) %>%
+        add_trace(dataDf(), x = ~Year, y = ~get(all_vars[3]), 
+                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[3]]) %>%
+        layout(xaxis = list(title = "Year",
+                            zerolinecolor = '#bdbdbd', 
+                            zerolinewidth = 2,
+                            showgrid = FALSE), 
+               yaxis = list(title="",  
+                            zerolinecolor = '#bdbdbd', 
+                            zerolinewidth = 2,
+                            showgrid = FALSE))
+    } else if (num_variables > 1){ #if only 2 variables are chosen
+      plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
+              type = 'scatter', mode = 'lines', name = name_mapping[all_vars[1]]) %>%
+        add_trace(dataDf(), x = ~Year, y = ~get(all_vars[2]), 
+                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[2]]) %>%
+        layout(xaxis = list(title = "Year",
+                            zerolinecolor = '#bdbdbd', 
+                            zerolinewidth = 2,
+                            showgrid = FALSE), 
+               yaxis = list(title="", 
+                            zerolinecolor = '#bdbdbd', 
+                            zerolinewidth = 2,
+                            showgrid = FALSE))
+    } else { #plot individually if only 1 is selected
+      fig1<- plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
+                     type = 'scatter', mode = 'lines', name = name_mapping[all_vars[1]])
+      fig<-subplot(fig1, nrows = 1) %>% 
+        layout(xaxis = list(title = "Year",
+                 zerolinecolor = '#bdbdbd', 
+                 zerolinewidth = 2,
+                 showgrid = FALSE), 
+               yaxis = list(title=name_mapping[all_vars[1]], 
+                 zerolinecolor = '#bdbdbd', 
+                 zerolinewidth = 2,
+                 showgrid = FALSE))
+      fig
+    }}#close if layered option
+  else {
+    plot_list <- lapply(1:num_variables, function(i) {
+      # Use name_mapping to get the correct Yname for the variable
+      y_name <- name_mapping[all_vars[i]]
+      y_name2 <- name_mapping2[all_vars[i]]
+      
+      plot_ly(dataDf(), x = ~Year, y = ~get(all_vars[i]), 
+              type = 'scatter', mode = 'lines', name = y_name) %>%
+        layout(yaxis = list(title = y_name2, side = 'left',showgrid = FALSE,zerolinecolor = '#bdbdbd', zerolinewidth = 1.5))
+    })
+    
+    fig <- subplot(plot_list, nrows = num_variables, shareX = TRUE, titleY = TRUE, 
+                   titleX = TRUE, margin = 0.03)
+    
+    layout(fig, xaxis = list(title = "Year",showgrid = FALSE),
+           plot_bgcolor = '#e5ecf6')
+  }}
+
