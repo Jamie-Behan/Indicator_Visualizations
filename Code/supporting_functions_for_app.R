@@ -55,16 +55,6 @@ fish_controls <- function(species, selected_vars, var_name) {
   
   return(controls)
 }
-###### finding name of second longest column (excluding NAs) ##############
-second_col<- function (df){
-  m1 = sapply(df, function(x) sum(!is.na(x))) #find length of each column
-  m2 = m1[-which.max(m1)] #find second longest column
-  mN = names(which.max(m2)) #get name of second longest column
-  mP<-match(mN,names(df)) #match name of second longest column to column name of df
-  mL = length(na.omit(df[,mP])) #reomve NAs of identified column of df and get length
-  return(mL)
-}
-
 ########create sidebar: #########
 sidebar <- dashboardSidebar(width = 150,
                             tags$style(".left-side, .main-sidebar {padding-top: 100px}"),
@@ -390,3 +380,26 @@ plot_function<-function(plottingstyle,num_variables=num_variables, dataDf=dataDf
            plot_bgcolor = '#e5ecf6')
   }}
 
+
+################ function for datatable ####################
+datatable_function<-function(all_varsY=all_varsY){
+
+  table_subset <- Both2[, all_varsY, drop = FALSE]
+
+  
+  # Find the starting year based on the second oldest column
+  start_year <- min(which(!is.na(table_subset$Year)))  # Initialize start year with the first non-NA year
+  # Find the starting year of all data columns (excluding "Year")
+  data_start_years <- sapply(all_varsY[-1], function(var) min(which(!is.na(table_subset[[var]]))))
+  # If all data columns start at the same year, update start_year
+  if (length(unique(data_start_years)) == 1) {
+    start_year <- min(data_start_years)
+  } else {
+    # Find the second oldest column and update start_year if necessary
+    start_year <- sort(unique(data_start_years))[2]}
+  # Subset the data from the start_year to the end
+  table_subset <- table_subset[start_year:nrow(table_subset), ]
+  # Replace column names with prettier name labels
+  colnames(table_subset) <- name_mapping[colnames(table_subset)]
+  DT::datatable(table_subset,options = list(pageLength = 30))
+  }
