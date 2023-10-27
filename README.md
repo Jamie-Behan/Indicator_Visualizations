@@ -36,6 +36,8 @@
 | File | Description |
 | ----------- | ----------- |
 |**stock_assess_data2.csv**| Other stock data used in this app <ul><li>these data are subject to change overtime as app is still in progress</li>|
+|**GLORYs_salinity**| Folder containing original .nc slinity data, post-processing .csv salinity data, and metadata .txt file|
+|**DisMAP**| Folder containing mean latitude and depth data that were sourced from [DisMAP](https://apps-st.fisheries.noaa.gov/dismap/). Individual files are not discriptivley named as the app is intended to use them as they come named from the original downloads from the site.|
 
 ### **3. "Table" folder containing code and information regarding table building process for the RStudio 2022 table competition.**
 
