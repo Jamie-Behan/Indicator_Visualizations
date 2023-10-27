@@ -14,10 +14,15 @@ metadata <-tabItem(tabName = "Metadata",
               "AMO (Atlantic Multidecadal Oscillation) Index. These data represent annual means of the NOAA Physical Sciences Laboratory's unsmoothed short monthly AMO dataset found at https://psl.noaa.gov/data/timeseries/AMO/. 1948-present. These data represent the weighted average over the N Atlantic from 0 to 70N, and have been detrended."
               ),
             accordionItem(
+              title = "Atlantic Herring Seasonal Latitude and Depth (Prey)",
+              status = "primary",
+              "Atlantic Herring Seasonal Latitude (Decimal Degrees) and Depth (m) are sourced from the NOAA Fisheries' Distribution Mapping and Analysis Portal (DisMAP). Data represent the mean center of gravity (geographic center) metrics from the NEFSC bottom trawl survey. Metrics were calculated as biomass-weighted averages of depth and latitude, weighted by the interpolated biomass at each depth or latitude for each year and season (fall, spring) of the bottom trawl survey.  See https://apps-st.fisheries.noaa.gov/dismap/ for more info. "
+            ),
+            accordionItem(
               title = "In-situ Bottom Temperature Anomaly (NEFSC)",
               status = "primary",
               "Annual bottom temperature anomalies for the GOM region. Bottom Temperature data collected from NEFSC survey from 1977-present. 
-                                          In ℃.Data are sourced from the R package 'ecodata'. See https://noaa-edab.github.io/tech-doc/ for more info."
+                                        In ℃.Data are sourced from the R package 'ecodata'. See https://noaa-edab.github.io/tech-doc/ for more info."
             ),
             accordionItem(
               title = "Bottom Temperature Anomaly (GLORYS)",
@@ -31,6 +36,7 @@ metadata <-tabItem(tabName = "Metadata",
               status = "primary",
               "Calanus finmarchicus abundance anomalies for the GOM region. Data are sourced from the R package 'ecodata'. See https://noaa-edab.github.io/tech-doc/ for more info. "
             ),
+
             accordionItem(
               title = "Median Cholorphyll A",
               status = "primary",
@@ -78,10 +84,16 @@ metadata <-tabItem(tabName = "Metadata",
               status = "primary",
               "Annual SST anomalies for the GOM region. SST data collected from NEFSC survey from 1977-present. 
                                           In ℃. Data are sourced from the R package 'ecodata'. See https://noaa-edab.github.io/tech-doc/ for more info."
+            ),
+            accordionItem(
+              title = "Sea Surface Salinity",
+              status = "primary",
+              "Sea surface salinity (so[10^-3]) data are sourced from the Global Ocean Physics Reanalysis Product 'GLOBAL_MULTIYEAR_PHY_001_030'. These data are
+               available from 1993-2020 and the most surface water layer (-0.5m) was selected. Salinity data processing methods for this project can be found in 'salinity_GLORYs_1993-2020.R'"
             )
             
           ),#accordion
-          title = "Environmental Data", footer = NULL, status = "success",
+          title = "Environmental and Climate Data", footer = NULL, status = "success",
           solidHeader = FALSE, background = NULL, width = 12, height = NULL,
           collapsible = TRUE, collapsed = TRUE)#box
         ,
@@ -150,8 +162,25 @@ metadata <-tabItem(tabName = "Metadata",
               )
             )
           ),
+          #####American Lobster accordion#####
+          accordion(
+            id = "accordion3",
+            accordionItem(
+              title = "American Lobster (Homarus americanus):",
+              status = "success",
+              collapsed = TRUE,
+              accordionItem(
+                title = "American Lobster Seasonal Latitude and Depth",
+                status = "primary",
+                collapsed = FALSE,
+                "American Lobster Seasonal Latitude (Decimal Degrees) and Depth (m) are sourced from the NOAA Fisheries' Distribution Mapping and Analysis Portal (DisMAP). Data represent the mean center of gravity (geographic center) metrics from the NEFSC bottom trawl survey. Metrics were calculated as biomass-weighted averages of depth and latitude, weighted by the interpolated biomass at each depth or latitude for each year and season (fall, spring) of the bottom trawl survey.  See https://apps-st.fisheries.noaa.gov/dismap/ for more info. "
+              )
+            )
+          ),
           #############
           title = "Stock Data", footer = NULL, status = "success",
           solidHeader = FALSE, background = NULL, width = 12, height = NULL,
           collapsible = TRUE, collapsed = TRUE)#box
 )#tabitem
+
+
