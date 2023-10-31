@@ -1,7 +1,7 @@
 #### Load R packages ######
 if (!require("pacman")) install.packages("pacman")
 library(pacman)
-pacman::p_load(shiny,plotly,DT,shinyjs,shinythemes,dplyr,stringr,readtext,XML,data.table,ecodata,shinyBS,huxtable,gridExtra,ggplot2,shinyWidgets,readxl,htmltools,knitr,shinydashboard,shinydashboardPlus,gmRi,here,install=TRUE)
+pacman::p_load(shiny,plotly,DT,shinyjs,shinythemes,dplyr,stringr,readtext,XML,data.table,ecodata,shinyBS,huxtable,gridExtra,ggplot2,shinyWidgets,readxl,htmltools,knitr,shinydashboard,shinydashboardPlus,gmRi,here,install=TRUE,purrr)
 here()
 ##### LOAD DATA ######
 source(here("Code/Compile_data.R"))
@@ -44,6 +44,12 @@ ui <- dashboardPage(
                                         "Select Plotting Style",
                                         choices = c("Layered (Choose up to 5 Variables)" = "Layered", "Stacked" = "Stacked"),
                                         selected = "Stacked"
+                                      ),
+                                      prettySwitch(
+                                        inputId = "trendline",
+                                        label = "Show Trendline(s)",
+                                        fill = TRUE, 
+                                        status = "primary"
                                       )
                                     ),
                                     column(
@@ -189,12 +195,17 @@ server <- function(input, output, session) {
   dataDf <- reactive({
     temp <- Both2
   })
-  
+#  output$stripedbass_plot <- renderPlotly({
+#    num_variables <- length(c(input$SB_recruitment_variable,input$SB_growth_variable,input$SB_other_variable, input$SB_Abiotic_variable,input$SB_Biotic_variable))
+#    all_vars<-c(input$SB_recruitment_variable,input$SB_growth_variable,input$SB_other_variable, input$SB_Abiotic_variable,input$SB_Biotic_variable)
+ #   plot_function(plottingstyle = input$SB_Plotting_Style,num_variables=num_variables, dataDf=dataDf, all_vars=all_vars, name_mapping=name_mapping, name_mapping2=name_mapping2)
+#  })#close renderPlotly
   output$stripedbass_plot <- renderPlotly({
-    num_variables <- length(c(input$SB_recruitment_variable,input$SB_growth_variable,input$SB_other_variable, input$SB_Abiotic_variable,input$SB_Biotic_variable))
-    all_vars<-c(input$SB_recruitment_variable,input$SB_growth_variable,input$SB_other_variable, input$SB_Abiotic_variable,input$SB_Biotic_variable)
-    plot_function(plottingstyle = input$SB_Plotting_Style,num_variables=num_variables, dataDf=dataDf, all_vars=all_vars, name_mapping=name_mapping, name_mapping2=name_mapping2)
-  })#close renderPlotly
+    num_variables <- length(c(input$SB_recruitment_variable, input$SB_growth_variable, input$SB_other_variable, input$SB_Abiotic_variable, input$SB_Biotic_variable))
+    all_vars <- c(input$SB_recruitment_variable, input$SB_growth_variable, input$SB_other_variable, input$SB_Abiotic_variable, input$SB_Biotic_variable)
+    plot_function(plottingstyle = input$SB_Plotting_Style, num_variables = num_variables, dataDf = dataDf, all_vars = all_vars, name_mapping = name_mapping, name_mapping2 = name_mapping2, show_trendline=input$trendline)
+
+    })
   output$BFT_plot <- renderPlotly({
     num_variables <- length(c(input$BFT_recruitment_variable,input$BFT_growth_variable,input$BFT_other_variable, input$BFT_Abiotic_variable,input$BFT_Biotic_variable))
     all_vars<-c(input$BFT_recruitment_variable,input$BFT_growth_variable,input$BFT_other_variable, input$BFT_Abiotic_variable,input$BFT_Biotic_variable)

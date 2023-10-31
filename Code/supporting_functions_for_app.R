@@ -280,8 +280,11 @@ for (col_name in colnames(Both2)) {
 # Create a named vector mapping Data_name to Yname
 name_mapping <- setNames(new_df$Yname, new_df$Data_name)
 name_mapping2 <- setNames(new_df$Yname2, new_df$Data_name)
+################ Estimate trendlines function ###########
+# Calculate trendlines for each variable based on dataDf()
+
 ################ plotly function for stacked/layered plots ####################
-plot_function<-function(plottingstyle,num_variables=num_variables, dataDf=dataDf, all_vars=all_vars, name_mapping=name_mapping, name_mapping2=name_mapping2){
+plot_function<-function(plottingstyle,num_variables=num_variables, dataDf=dataDf, all_vars=all_vars, name_mapping=name_mapping, name_mapping2=name_mapping2, show_trendline=input$trendline){
   if (plottingstyle == "Layered") {
     
     if (num_variables > 4){ #plot 5 variables together
@@ -336,33 +339,63 @@ plot_function<-function(plottingstyle,num_variables=num_variables, dataDf=dataDf
                             zerolinewidth = 2,
                             showgrid = FALSE))
     } else if (num_variables > 1){ #if only 2 variables are chosen
-      plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
-              type = 'scatter', mode = 'lines', name = name_mapping[all_vars[1]]) %>%
-        add_trace(dataDf(), x = ~Year, y = ~get(all_vars[2]), 
-                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[2]]) %>%
+      data_subset <- dataDf() %>%
+        filter(across(all_vars, ~ !is.na(.))) %>%
+        select(Year, all_vars)
+      trendlines <- lapply(all_vars, function(var) {
+        if (show_trendline) {
+          model <- lm(as.formula(paste0(var, " ~ Year")), data = dataDf(), na.action = na.exclude)
+          fitted_values <- predict(model, newdata = data.frame(Year = dataDf()$Year))
+          extended_trendline <- rep(NA, nrow(dataDf()))
+          extended_trendline[!is.na(dataDf()[[var]])] <- fitted_values[!is.na(dataDf()[[var]])]
+          extended_trendline
+        } else {
+          rep(NA, nrow(dataDf()))
+        }
+      })
+      # Create a data frame for plotting trendlines
+      trendline_data <- data.frame(Year = dataDf()$Year, 
+                                   Trendline1 = trendlines[[1]],
+                                   Trendline2 = trendlines[[2]])  #you have 2 variables
+      
+      plot_ly() %>%
+        # Add traces for the selected variables from dataDf()
+        add_trace(data = dataDf(), x = ~Year, y = ~get(all_vars[1]),
+                  type = 'scatter', mode = 'lines', name = name_mapping[all_vars[1]]) %>%
+        add_trace(data = dataDf(), x = ~Year, y = ~get(all_vars[2]),
+                  type = 'scatter', mode = 'lines', name = name_mapping[all_vars[2]]) %>%
+        # Add trendlines if input$trendline is TRUE for the combined trendline_data
+        add_trace(data = trendline_data, x = ~Year, y = ~Trendline1,
+                  type = 'scatter', mode = 'lines', name = paste(name_mapping[all_vars[1]], "Trend")) %>%
+        add_trace(data = trendline_data, x = ~Year, y = ~Trendline2,
+                  type = 'scatter', mode = 'lines', name = paste(name_mapping[all_vars[2]], "Trend")) %>%
         layout(xaxis = list(title = "Year",
-                            zerolinecolor = '#bdbdbd', 
+                            zerolinecolor = '#bdbdbd',
                             zerolinewidth = 2,
-                            showgrid = FALSE), 
-               yaxis = list(title="", 
-                            zerolinecolor = '#bdbdbd', 
+                            showgrid = FALSE),
+               yaxis = list(title = "",
+                            zerolinecolor = '#bdbdbd',
                             zerolinewidth = 2,
                             showgrid = FALSE))
+  
     } else { #plot individually if only 1 is selected
       fig1<- plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
                      type = 'scatter', mode = 'lines', name = name_mapping[all_vars[1]])
       fig<-subplot(fig1, nrows = 1) %>% 
         layout(xaxis = list(title = "Year",
                  zerolinecolor = '#bdbdbd', 
-                 zerolinewidth = 2,
+                zerolinewidth = 2,
                  showgrid = FALSE), 
                yaxis = list(title=name_mapping[all_vars[1]], 
                  zerolinecolor = '#bdbdbd', 
                  zerolinewidth = 2,
                  showgrid = FALSE))
       fig
+
+      
     }}#close if layered option
   else {
+
     plot_list <- lapply(1:num_variables, function(i) {
       # Use name_mapping to get the correct Yname for the variable
       y_name <- name_mapping[all_vars[i]]
@@ -379,7 +412,6 @@ plot_function<-function(plottingstyle,num_variables=num_variables, dataDf=dataDf
     layout(fig, xaxis = list(title = "Year",showgrid = FALSE),
            plot_bgcolor = '#e5ecf6')
   }}
-
 
 ################ function for datatable ####################
 datatable_function<-function(all_varsY=all_varsY){
