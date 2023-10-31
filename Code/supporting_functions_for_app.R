@@ -285,19 +285,63 @@ name_mapping2 <- setNames(new_df$Yname2, new_df$Data_name)
 
 ################ plotly function for stacked/layered plots ####################
 plot_function<-function(plottingstyle,num_variables=num_variables, dataDf=dataDf, all_vars=all_vars, name_mapping=name_mapping, name_mapping2=name_mapping2, show_trendline=input$trendline){
+####supporting functions used throughout plot_function  
+  data_subset <- dataDf() %>%
+    filter(across(all_vars, ~ !is.na(.))) %>%
+    select(Year, all_vars)
+  trendlines <- lapply(all_vars, function(var) {
+    if (show_trendline) {
+      model <- lm(as.formula(paste0(var, " ~ Year")), data = dataDf(), na.action = na.exclude)
+      fitted_values <- predict(model, newdata = data.frame(Year = dataDf()$Year))
+      extended_trendline <- rep(NA, nrow(dataDf()))
+      extended_trendline[!is.na(dataDf()[[var]])] <- fitted_values[!is.na(dataDf()[[var]])]
+      extended_trendline
+    } else {
+      rep(NA, nrow(dataDf()))
+    }
+  })
+####### start plot_function  
   if (plottingstyle == "Layered") {
     
     if (num_variables > 4){ #plot 5 variables together
+      # Create a data frame for plotting trendlines
+      trendline_data <- data.frame(Year = dataDf()$Year, 
+                                   Trendline1 = trendlines[[1]],
+                                   Trendline2 = trendlines[[2]],
+                                   Trendline3 = trendlines[[3]],
+                                   Trendline4 = trendlines[[4]],
+                                   Trendline5 = trendlines[[5]])  #you have 5 variables
       plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
-              type = 'scatter', mode = 'lines', name =name_mapping[all_vars[1]]) %>%
+              type = 'scatter', mode = 'lines', name =name_mapping[all_vars[1]],
+              line = list(color = "#00608A")) %>%
         add_trace(dataDf(), x = ~Year, y = ~get(all_vars[2]), 
-                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[2]]) %>%
+                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[2]],
+                  line = list(color = "#ABB400")) %>%
         add_trace(dataDf(), x = ~Year, y = ~get(all_vars[3]), 
-                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[3]]) %>%
+                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[3]],
+                  line = list(color = "#EA4F12")) %>%
         add_trace(dataDf(), x = ~Year, y = ~get(all_vars[4]), 
-                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[4]]) %>%
+                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[4]],
+                  line = list(color = "#683562")) %>%
         add_trace(dataDf(), x = ~Year, y = ~get(all_vars[5]), 
-                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[5]]) %>%
+                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[5]],
+                  line = list(color = "#FF7272")) %>%
+        # Add trendlines if input$trendline is TRUE for the combined trendline_data
+        add_trace(data = trendline_data, x = ~Year, y = ~Trendline1,
+                  type = 'scatter', mode = 'lines', name = paste(name_mapping[all_vars[1]], "Trend"),
+                  line = list(dash = 'dot',color = "#00608A")) %>%
+        add_trace(data = trendline_data, x = ~Year, y = ~Trendline2,
+                  type = 'scatter', mode = 'lines', name = paste(name_mapping[all_vars[2]], "Trend"),
+                  line = list(dash = 'dot',color = "#ABB400")) %>%
+        add_trace(data = trendline_data, x = ~Year, y = ~Trendline3,
+                  type = 'scatter', mode = 'lines', name = paste(name_mapping[all_vars[3]], "Trend"),
+                  line = list(dash = 'dot',color = "#EA4F12")) %>%
+        add_trace(data = trendline_data, x = ~Year, y = ~Trendline4,
+                  type = 'scatter', mode = 'lines', name = paste(name_mapping[all_vars[4]], "Trend"),
+                  line = list(dash = 'dot',color = "#683562")) %>%
+        add_trace(data = trendline_data, x = ~Year, y = ~Trendline5,
+                  type = 'scatter', mode = 'lines', name = paste(name_mapping[all_vars[5]], "Trend"),
+                  line = list(dash = 'dot',color = "#FF7272")) %>%
         layout(xaxis = list(title = "Year",
                             zerolinecolor = '#bdbdbd', 
                             zerolinewidth = 2,
@@ -307,14 +351,37 @@ plot_function<-function(plottingstyle,num_variables=num_variables, dataDf=dataDf
                             zerolinewidth = 2,
                             showgrid = FALSE))
     } else if (num_variables == 4){ #if only 4 variables are chosen
+      # Create a data frame for plotting trendlines
+      trendline_data <- data.frame(Year = dataDf()$Year, 
+                                   Trendline1 = trendlines[[1]],
+                                   Trendline2 = trendlines[[2]],
+                                   Trendline3 = trendlines[[3]],
+                                   Trendline4 = trendlines[[4]])  #you have 4 variables
       plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
-              type = 'scatter', mode = 'lines', name =name_mapping[all_vars[1]]) %>%
+              type = 'scatter', mode = 'lines', name =name_mapping[all_vars[1]],
+              line = list(color = "#00608A")) %>%
         add_trace(dataDf(), x = ~Year, y = ~get(all_vars[2]), 
-                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[2]]) %>%
+                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[2]],
+                  line = list(color = "#ABB400")) %>%
         add_trace(dataDf(), x = ~Year, y = ~get(all_vars[3]), 
-                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[3]]) %>%
+                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[3]],
+                  line = list(color = "#EA4F12")) %>%
         add_trace(dataDf(), x = ~Year, y = ~get(all_vars[4]), 
-                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[4]]) %>%
+                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[4]],
+                  line = list(color = "#683562")) %>%
+        # Add trendlines if input$trendline is TRUE for the combined trendline_data
+        add_trace(data = trendline_data, x = ~Year, y = ~Trendline1,
+                  type = 'scatter', mode = 'lines', name = paste(name_mapping[all_vars[1]], "Trend"),
+                  line = list(dash = 'dot',color = "#00608A")) %>%
+        add_trace(data = trendline_data, x = ~Year, y = ~Trendline2,
+                  type = 'scatter', mode = 'lines', name = paste(name_mapping[all_vars[2]], "Trend"),
+                  line = list(dash = 'dot',color = "#ABB400")) %>%
+        add_trace(data = trendline_data, x = ~Year, y = ~Trendline3,
+                  type = 'scatter', mode = 'lines', name = paste(name_mapping[all_vars[3]], "Trend"),
+                  line = list(dash = 'dot',color = "#EA4F12")) %>%
+        add_trace(data = trendline_data, x = ~Year, y = ~Trendline4,
+                  type = 'scatter', mode = 'lines', name = paste(name_mapping[all_vars[4]], "Trend"),
+                  line = list(dash = 'dot',color = "#683562")) %>%
         layout(xaxis = list(title = "Year",
                             zerolinecolor = '#bdbdbd', 
                             zerolinewidth = 2,
@@ -324,12 +391,30 @@ plot_function<-function(plottingstyle,num_variables=num_variables, dataDf=dataDf
                             zerolinewidth = 2,
                             showgrid = FALSE))
     } else if (num_variables == 3){ #if only 3 variables are chosen
+      # Create a data frame for plotting trendlines
+      trendline_data <- data.frame(Year = dataDf()$Year, 
+                                   Trendline1 = trendlines[[1]],
+                                   Trendline2 = trendlines[[2]],
+                                   Trendline3 = trendlines[[3]])  #you have 3 variables
       plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
-              type = 'scatter', mode = 'lines', name =name_mapping[all_vars[1]]) %>%
+              type = 'scatter', mode = 'lines', name =name_mapping[all_vars[1]],
+              line = list(color = "#00608A")) %>%
         add_trace(dataDf(), x = ~Year, y = ~get(all_vars[2]), 
-                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[2]]) %>%
+                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[2]],
+                  line = list(color = "#ABB400")) %>%
         add_trace(dataDf(), x = ~Year, y = ~get(all_vars[3]), 
-                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[3]]) %>%
+                  type = 'scatter', mode = 'lines',name =name_mapping[all_vars[3]],
+                  line = list(color = "#EA4F12")) %>%
+        # Add trendlines if input$trendline is TRUE for the combined trendline_data
+        add_trace(data = trendline_data, x = ~Year, y = ~Trendline1,
+                  type = 'scatter', mode = 'lines', name = paste(name_mapping[all_vars[1]], "Trend"),
+                  line = list(dash = 'dot',color = "#00608A")) %>%
+        add_trace(data = trendline_data, x = ~Year, y = ~Trendline2,
+                  type = 'scatter', mode = 'lines', name = paste(name_mapping[all_vars[2]], "Trend"),
+                  line = list(dash = 'dot',color = "#ABB400")) %>%
+        add_trace(data = trendline_data, x = ~Year, y = ~Trendline3,
+                  type = 'scatter', mode = 'lines', name = paste(name_mapping[all_vars[3]], "Trend"),
+                  line = list(dash = 'dot',color = "#EA4F12")) %>%
         layout(xaxis = list(title = "Year",
                             zerolinecolor = '#bdbdbd', 
                             zerolinewidth = 2,
@@ -339,20 +424,6 @@ plot_function<-function(plottingstyle,num_variables=num_variables, dataDf=dataDf
                             zerolinewidth = 2,
                             showgrid = FALSE))
     } else if (num_variables > 1){ #if only 2 variables are chosen
-      data_subset <- dataDf() %>%
-        filter(across(all_vars, ~ !is.na(.))) %>%
-        select(Year, all_vars)
-      trendlines <- lapply(all_vars, function(var) {
-        if (show_trendline) {
-          model <- lm(as.formula(paste0(var, " ~ Year")), data = dataDf(), na.action = na.exclude)
-          fitted_values <- predict(model, newdata = data.frame(Year = dataDf()$Year))
-          extended_trendline <- rep(NA, nrow(dataDf()))
-          extended_trendline[!is.na(dataDf()[[var]])] <- fitted_values[!is.na(dataDf()[[var]])]
-          extended_trendline
-        } else {
-          rep(NA, nrow(dataDf()))
-        }
-      })
       # Create a data frame for plotting trendlines
       trendline_data <- data.frame(Year = dataDf()$Year, 
                                    Trendline1 = trendlines[[1]],
@@ -361,14 +432,18 @@ plot_function<-function(plottingstyle,num_variables=num_variables, dataDf=dataDf
       plot_ly() %>%
         # Add traces for the selected variables from dataDf()
         add_trace(data = dataDf(), x = ~Year, y = ~get(all_vars[1]),
-                  type = 'scatter', mode = 'lines', name = name_mapping[all_vars[1]]) %>%
+                  type = 'scatter', mode = 'lines', name = name_mapping[all_vars[1]],
+                  line = list(color = "#00608A")) %>%
         add_trace(data = dataDf(), x = ~Year, y = ~get(all_vars[2]),
-                  type = 'scatter', mode = 'lines', name = name_mapping[all_vars[2]]) %>%
+                  type = 'scatter', mode = 'lines', name = name_mapping[all_vars[2]],
+      line = list(color = "#ABB400")) %>%
         # Add trendlines if input$trendline is TRUE for the combined trendline_data
         add_trace(data = trendline_data, x = ~Year, y = ~Trendline1,
-                  type = 'scatter', mode = 'lines', name = paste(name_mapping[all_vars[1]], "Trend")) %>%
+                  type = 'scatter', mode = 'lines', name = paste(name_mapping[all_vars[1]], "Trend"),
+      line = list(dash = 'dot',color = "#00608A")) %>%
         add_trace(data = trendline_data, x = ~Year, y = ~Trendline2,
-                  type = 'scatter', mode = 'lines', name = paste(name_mapping[all_vars[2]], "Trend")) %>%
+                  type = 'scatter', mode = 'lines', name = paste(name_mapping[all_vars[2]], "Trend"),
+                  line = list(dash = 'dot',color = "#ABB400")) %>%
         layout(xaxis = list(title = "Year",
                             zerolinecolor = '#bdbdbd',
                             zerolinewidth = 2,
@@ -379,20 +454,27 @@ plot_function<-function(plottingstyle,num_variables=num_variables, dataDf=dataDf
                             showgrid = FALSE))
   
     } else { #plot individually if only 1 is selected
-      fig1<- plot_ly(dataDf(), x = ~Year, y =~get(all_vars[1]), 
-                     type = 'scatter', mode = 'lines', name = name_mapping[all_vars[1]])
-      fig<-subplot(fig1, nrows = 1) %>% 
-        layout(xaxis = list(title = "Year",
-                 zerolinecolor = '#bdbdbd', 
-                zerolinewidth = 2,
-                 showgrid = FALSE), 
-               yaxis = list(title=name_mapping[all_vars[1]], 
-                 zerolinecolor = '#bdbdbd', 
-                 zerolinewidth = 2,
-                 showgrid = FALSE))
-      fig
+      # Create a data frame for plotting trendlines
+      trendline_data <- data.frame(Year = dataDf()$Year, 
+                                   Trendline1 = trendlines[[1]])  #you have 1 variable
+plot_ly() %>%
+  # Add traces for the selected variables from dataDf()
+  add_trace(data = dataDf(), x = ~Year, y = ~get(all_vars[1]),
+            type = 'scatter', mode = 'lines', name = name_mapping[all_vars[1]],
+            line = list(color = "#00608A")) %>%
+  # Add trendlines if input$trendline is TRUE for the combined trendline_data
+  add_trace(data = trendline_data, x = ~Year, y = ~Trendline1,
+            type = 'scatter', mode = 'lines', name = paste(name_mapping[all_vars[1]], "Trend"),
+            line = list(dash = 'dot',color = "#00608A")) %>%
+  layout(xaxis = list(title = "Year",
+                      zerolinecolor = '#bdbdbd',
+                      zerolinewidth = 2,
+                      showgrid = FALSE),
+         yaxis = list(title = "",
+                      zerolinecolor = '#bdbdbd',
+                      zerolinewidth = 2,
+                      showgrid = FALSE))
 
-      
     }}#close if layered option
   else {
 

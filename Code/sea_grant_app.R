@@ -195,11 +195,6 @@ server <- function(input, output, session) {
   dataDf <- reactive({
     temp <- Both2
   })
-#  output$stripedbass_plot <- renderPlotly({
-#    num_variables <- length(c(input$SB_recruitment_variable,input$SB_growth_variable,input$SB_other_variable, input$SB_Abiotic_variable,input$SB_Biotic_variable))
-#    all_vars<-c(input$SB_recruitment_variable,input$SB_growth_variable,input$SB_other_variable, input$SB_Abiotic_variable,input$SB_Biotic_variable)
- #   plot_function(plottingstyle = input$SB_Plotting_Style,num_variables=num_variables, dataDf=dataDf, all_vars=all_vars, name_mapping=name_mapping, name_mapping2=name_mapping2)
-#  })#close renderPlotly
   output$stripedbass_plot <- renderPlotly({
     num_variables <- length(c(input$SB_recruitment_variable, input$SB_growth_variable, input$SB_other_variable, input$SB_Abiotic_variable, input$SB_Biotic_variable))
     all_vars <- c(input$SB_recruitment_variable, input$SB_growth_variable, input$SB_other_variable, input$SB_Abiotic_variable, input$SB_Biotic_variable)
