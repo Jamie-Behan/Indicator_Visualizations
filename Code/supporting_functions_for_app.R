@@ -483,15 +483,36 @@ plot_ly() %>%
       y_name <- name_mapping[all_vars[i]]
       y_name2 <- name_mapping2[all_vars[i]]
       
+#      plot_ly(dataDf(), x = ~Year, y = ~get(all_vars[i]), 
+#              type = 'scatter', mode = 'lines', name = y_name) %>%
+#        layout(yaxis = list(title = y_name2, side = 'left',showgrid = FALSE,zerolinecolor = '#bdbdbd', zerolinewidth = 1.5))
+#    })
+    
+#    fig <- subplot(plot_list, nrows = num_variables, shareX = TRUE, titleY = TRUE, 
+#                   titleX = TRUE, margin = 0.03)
+    
+#    layout(fig, xaxis = list(title = "Year",showgrid = FALSE),
+#           plot_bgcolor = '#e5ecf6')
+      # Calculate trendline if input$trendline is TRUE
+      if (show_trendline) {
+        trendline_model <- lm(as.formula(paste0(all_vars[i], " ~ Year")), data = dataDf(), na.action = na.exclude)
+        trendline_values <- predict(trendline_model, newdata = data.frame(Year = dataDf()$Year))
+      } else {
+        trendline_values <- rep(NA, nrow(dataDf()))
+      }
+      
       plot_ly(dataDf(), x = ~Year, y = ~get(all_vars[i]), 
               type = 'scatter', mode = 'lines', name = y_name) %>%
-        layout(yaxis = list(title = y_name2, side = 'left',showgrid = FALSE,zerolinecolor = '#bdbdbd', zerolinewidth = 1.5))
+        add_trace(x = ~Year, y = ~trendline_values,
+                  type = 'scatter', mode = 'lines', name = paste(y_name, "Trendline"),
+        line = list(dash = 'dash',width = 0.5, color = "#000000")) %>%
+        layout(yaxis = list(title = y_name2, side = 'left', showgrid = FALSE, zerolinecolor = '#bdbdbd', zerolinewidth = 1.5))
     })
     
     fig <- subplot(plot_list, nrows = num_variables, shareX = TRUE, titleY = TRUE, 
                    titleX = TRUE, margin = 0.03)
     
-    layout(fig, xaxis = list(title = "Year",showgrid = FALSE),
+    layout(fig, xaxis = list(title = "Year", showgrid = FALSE),
            plot_bgcolor = '#e5ecf6')
   }}
 
