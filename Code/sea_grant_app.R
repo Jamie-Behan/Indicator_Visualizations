@@ -46,7 +46,7 @@ ui <- dashboardPage(
                                         selected = "Stacked"
                                       ),
                                       prettySwitch(
-                                        inputId = "trendline",
+                                        inputId = "trendline_SB",
                                         label = "Show Trendline(s)",
                                         fill = TRUE, 
                                         status = "primary"
@@ -104,6 +104,12 @@ ui <- dashboardPage(
                                           "Select Plotting Style",
                                           choices = c("Layered (Choose up to 5 Variables)" = "Layered", "Stacked" = "Stacked"),
                                           selected = "Stacked"
+                                        ),
+                                        prettySwitch(
+                                          inputId = "trendline_BFT",
+                                          label = "Show Trendline(s)",
+                                          fill = TRUE, 
+                                          status = "primary"
                                         )
                                       ),
                                       column(
@@ -158,6 +164,12 @@ ui <- dashboardPage(
                                           "Select Plotting Style",
                                           choices = c("Layered (Choose up to 5 Variables)" = "Layered", "Stacked" = "Stacked"),
                                           selected = "Stacked"
+                                        ),
+                                        prettySwitch(
+                                          inputId = "trendline_AL",
+                                          label = "Show Trendline(s)",
+                                          fill = TRUE, 
+                                          status = "primary"
                                         )
                                       ),
                                       column(
@@ -198,18 +210,18 @@ server <- function(input, output, session) {
   output$stripedbass_plot <- renderPlotly({
     num_variables <- length(c(input$SB_recruitment_variable, input$SB_growth_variable, input$SB_other_variable, input$SB_Abiotic_variable, input$SB_Biotic_variable))
     all_vars <- c(input$SB_recruitment_variable, input$SB_growth_variable, input$SB_other_variable, input$SB_Abiotic_variable, input$SB_Biotic_variable)
-    plot_function(plottingstyle = input$SB_Plotting_Style, num_variables = num_variables, dataDf = dataDf, all_vars = all_vars, name_mapping = name_mapping, name_mapping2 = name_mapping2, show_trendline=input$trendline)
+    plot_function(plottingstyle = input$SB_Plotting_Style, num_variables = num_variables, dataDf = dataDf, all_vars = all_vars, name_mapping = name_mapping, name_mapping2 = name_mapping2, show_trendline=input$trendline_SB)
 
     })
   output$BFT_plot <- renderPlotly({
     num_variables <- length(c(input$BFT_recruitment_variable,input$BFT_growth_variable,input$BFT_other_variable, input$BFT_Abiotic_variable,input$BFT_Biotic_variable))
     all_vars<-c(input$BFT_recruitment_variable,input$BFT_growth_variable,input$BFT_other_variable, input$BFT_Abiotic_variable,input$BFT_Biotic_variable)
-    plot_function(plottingstyle = input$BFT_Plotting_Style,num_variables=num_variables, dataDf=dataDf, all_vars=all_vars, name_mapping=name_mapping, name_mapping2=name_mapping2)
+    plot_function(plottingstyle = input$BFT_Plotting_Style,num_variables=num_variables, dataDf=dataDf, all_vars=all_vars, name_mapping=name_mapping, name_mapping2=name_mapping2, show_trendline=input$trendline_BFT)
   })#close renderPlotly
   output$AL_plot <- renderPlotly({
     num_variables <- length(c(input$AL_recruitment_variable,input$AL_distribution_variable,input$AL_other_variable, input$AL_Abiotic_variable,input$AL_Biotic_variable))
     all_vars<-c(input$AL_recruitment_variable,input$AL_distribution_variable,input$AL_other_variable, input$AL_Abiotic_variable,input$AL_Biotic_variable)
-    plot_function(plottingstyle = input$AL_Plotting_Style,num_variables=num_variables, dataDf=dataDf, all_vars=all_vars, name_mapping=name_mapping, name_mapping2=name_mapping2)
+    plot_function(plottingstyle = input$AL_Plotting_Style,num_variables=num_variables, dataDf=dataDf, all_vars=all_vars, name_mapping=name_mapping, name_mapping2=name_mapping2, show_trendline=input$trendline_AL)
   })#close renderPlotly
   
   output$mytable_SB <- DT::renderDataTable({

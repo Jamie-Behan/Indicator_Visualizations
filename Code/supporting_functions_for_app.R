@@ -284,7 +284,7 @@ name_mapping2 <- setNames(new_df$Yname2, new_df$Data_name)
 # Calculate trendlines for each variable based on dataDf()
 
 ################ plotly function for stacked/layered plots ####################
-plot_function<-function(plottingstyle,num_variables=num_variables, dataDf=dataDf, all_vars=all_vars, name_mapping=name_mapping, name_mapping2=name_mapping2, show_trendline=input$trendline){
+plot_function<-function(plottingstyle,num_variables=num_variables, dataDf=dataDf, all_vars=all_vars, name_mapping=name_mapping, name_mapping2=name_mapping2, show_trendline){
 ####supporting functions used throughout plot_function  
   data_subset <- dataDf() %>%
     filter(across(all_vars, ~ !is.na(.))) %>%
@@ -482,18 +482,7 @@ plot_ly() %>%
       # Use name_mapping to get the correct Yname for the variable
       y_name <- name_mapping[all_vars[i]]
       y_name2 <- name_mapping2[all_vars[i]]
-      
-#      plot_ly(dataDf(), x = ~Year, y = ~get(all_vars[i]), 
-#              type = 'scatter', mode = 'lines', name = y_name) %>%
-#        layout(yaxis = list(title = y_name2, side = 'left',showgrid = FALSE,zerolinecolor = '#bdbdbd', zerolinewidth = 1.5))
-#    })
-    
-#    fig <- subplot(plot_list, nrows = num_variables, shareX = TRUE, titleY = TRUE, 
-#                   titleX = TRUE, margin = 0.03)
-    
-#    layout(fig, xaxis = list(title = "Year",showgrid = FALSE),
-#           plot_bgcolor = '#e5ecf6')
-      # Calculate trendline if input$trendline is TRUE
+
       if (show_trendline) {
         trendline_model <- lm(as.formula(paste0(all_vars[i], " ~ Year")), data = dataDf(), na.action = na.exclude)
         trendline_values <- predict(trendline_model, newdata = data.frame(Year = dataDf()$Year))
@@ -504,7 +493,7 @@ plot_ly() %>%
       plot_ly(dataDf(), x = ~Year, y = ~get(all_vars[i]), 
               type = 'scatter', mode = 'lines', name = y_name) %>%
         add_trace(x = ~Year, y = ~trendline_values,
-                  type = 'scatter', mode = 'lines', name = paste(y_name, "Trendline"),
+                  type = 'scatter', mode = 'lines', name = paste(y_name, "Trend"),
         line = list(dash = 'dash',width = 0.5, color = "#000000")) %>%
         layout(yaxis = list(title = y_name2, side = 'left', showgrid = FALSE, zerolinecolor = '#bdbdbd', zerolinewidth = 1.5))
     })
