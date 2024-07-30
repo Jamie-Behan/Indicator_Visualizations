@@ -1,6 +1,7 @@
 if (!require("pacman")) install.packages("pacman")
 library(pacman)
-pacman::p_load(dplyr,reshape2,XML,stringr)
+#pacman::p_load(dplyr,reshape2,XML,stringr,install=TRUE)
+pacman::p_load(dplyr,terra,here,utils,install=TRUE)
 ####### Load in diamap .csv files from dismap folder ##########
 # Set the directory path where your .csv files are located
 folder_path <- here("Data", "DisMAP") 

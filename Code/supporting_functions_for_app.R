@@ -1,3 +1,14 @@
+library(dplyr)
+library(plotly)
+library(stats)
+library(htmltools)
+library(shiny)
+library(graphics)
+library(shinydashboardPlus)
+library(shinydashboard)
+library(DT)
+library(terra)
+library(utils)
 ###### tweaks, a list object to set up multiple-columns for checkboxGroupInput#####
 tweaks <- list(
   tags$head(
@@ -287,8 +298,8 @@ name_mapping2 <- setNames(new_df$Yname2, new_df$Data_name)
 plot_function<-function(plottingstyle,num_variables=num_variables, dataDf=dataDf, all_vars=all_vars, name_mapping=name_mapping, name_mapping2=name_mapping2, show_trendline){
 ####supporting functions used throughout plot_function  
   data_subset <- dataDf() %>%
-    filter(across(all_vars, ~ !is.na(.))) %>%
-    select(Year, all_vars)
+    filter(if_all(all_of(all_vars), ~ !is.na(.))) %>%
+    select(Year, all_of(all_vars))
   trendlines <- lapply(all_vars, function(var) {
     if (show_trendline) {
       model <- lm(as.formula(paste0(var, " ~ Year")), data = dataDf(), na.action = na.exclude)

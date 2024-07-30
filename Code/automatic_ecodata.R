@@ -1,6 +1,7 @@
 if (!require("pacman")) install.packages("pacman")
 library(pacman)
-pacman::p_load(ecodata, dplyr,reshape2,XML,stringr)
+#pacman::p_load(ecodata, dplyr,reshape2,XML,stringr,install=TRUE)
+pacman::p_load(dplyr,plotly,stats,reshape2,data.table,terra,utils,stringr,install=TRUE)
 ##### Bottom Temp & sst anomaly dataset#########
 ecodata_df<-as.data.frame(ecodata::bottom_temp[c(1:4)])
 ecodata_df<-ecodata_df[ecodata_df$Var == 'bottom temp anomaly in situ'| ecodata_df$Var == 'sst anomaly in situ',]
@@ -8,7 +9,9 @@ ecodata_df$Var[ecodata_df$Var == 'bottom temp anomaly in situ'] <- 'Bottom_Temp_
 ecodata_df$Var[ecodata_df$Var == 'sst anomaly in situ'] <- 'SST_Temp_Anomaly'
 
 ##### Bottom Temp raw dataset#########
-other_df<-as.data.frame(ecodata::bottom_temp_comp[c(1:4)])
+other_df<-as.data.frame(ecodata::bottom_temp_comp[c(1:5)])
+other_df<-subset(other_df, Source == "GLORYS")
+other_df<-as.data.frame(other_df[-c(4)])
 other_df<-other_df[other_df$Var == 'Annual_Bottom Temp',]
 other_df$Var <- paste0("Annual_Bottom_Temp_Absolute")
 
@@ -29,9 +32,15 @@ other_df$Var[other_df$Var == 'LgCopepods'] <- 'Large_Copepods_Abundance_Anomaly'
 ecodata_df<-rbind(ecodata_df,other_df)
 ###GSI dataset######
 other_df<-as.data.frame(ecodata::gsi)
-other_df$Time <- substr(gsi$Time, 1, 4) 
-other_df<-distinct(data.frame(other_df[c(2,4)],aggregate(Value~Time,data=other_df,FUN="mean")))
+other_df<-subset(other_df, Var == "gulf stream index")
+other_df$Time <- as.numeric(substr(other_df$Time, 1, 4)) 
+
+other_df <- other_df %>%
+  group_by(Time) %>%
+  mutate(Value = mean(Value)) %>%
+  ungroup()
 other_df$Var <- paste0("GSI")
+other_df <-distinct(other_df)
 
 ecodata_df<-rbind(ecodata_df,other_df)
 ####NAO dataset#######
@@ -45,7 +54,15 @@ other_df$Var <- paste0(other_df$Var,"_OISST")
 ecodata_df<-rbind(ecodata_df,other_df)
 #### forage fish dataset ####
 other_df<-as.data.frame(ecodata::forage_index)
-other_df<-other_df[other_df$Var == 'Annual Forage Fish Biomass Estimate'& other_df$EPU == 'GOM',]
+other_df<-other_df[other_df$EPU == 'GOM',]
+other_df<-other_df[other_df$Var == 'Fall Forage Fish Biomass Estimate'| other_df$Var == 'Spring Forage Fish Biomass Estimate',]
+
+other_df <- other_df %>%
+  group_by(Time) %>%
+  mutate(Value = mean(Value)) %>%
+  ungroup()
+#remove redunuant rows, since spring and fall seasons have been averaged to one annual value
+other_df <- distinct(other_df, Time, .keep_all = TRUE)
 other_df<-other_df[,c(-5)]
 other_df$Var <- paste0("Annual_Forage_Fish_Biomass")
 ecodata_df<-rbind(ecodata_df,other_df)
@@ -106,4 +123,4 @@ df_list <- list(GOM_ecodata,ALL_ecodata,hudson_river)
 ecodata_df<-Reduce(function(x, y) merge(x, y, all=TRUE), df_list)
 ecodata_df<-merge(ecodata_df,amo_data,by="Year")
 #rm(df_list,GOM_ecodata,GB_ecodata,MAB_ecodata,SS_ecodata,ALL_ecodata,hudson_river)
-rm(df_list,GOM_ecodata,ALL_ecodata,hudson_river,amo_data)
+rm(df_list,GOM_ecodata,ALL_ecodata,hudson_river,amo_data,url)

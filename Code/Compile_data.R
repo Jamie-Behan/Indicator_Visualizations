@@ -1,4 +1,8 @@
 ########## ENVIRONMENTAL DATA###################################################################################
+library(terra)
+library(XML)
+library(here)
+library(utils)
 #### SOURCE "automatic_ecodata.R"
 source(here("Code/automatic_ecodata.R"))
 big_ecodata<-lapply(ecodata_df,as.numeric)
