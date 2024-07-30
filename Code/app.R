@@ -1,10 +1,25 @@
 #### Load R packages ######
-if (!require("pacman")) install.packages("pacman")
-library(pacman)
-pacman::p_load(shiny,plotly,DT,shinyjs,shinythemes,dplyr,stringr,readtext,XML,data.table,ecodata,shinyBS,huxtable,gridExtra,ggplot2,shinyWidgets,readxl,htmltools,knitr,shinydashboard,shinydashboardPlus,gmRi,here,install=TRUE,purrr)
+#if (!require("remotes")) install.packages("remotes")
+#remotes::install_github("gulfofmaine/gmRi")
+#remotes::install_github("noaa-edab/ecodata",build_vignettes=TRUE)
+library(here)
+library(DT)
+library(shiny)
+library(htmltools)
+library(shinydashboardPlus)
+library(shinydashboard)
+library(plotly)
+library(shinyWidgets)
+library(utils)
+library(Rcpp)
+library(cli)
+
+#pacman::p_load(shiny,plotly,DT,shinyjs,shinythemes,dplyr,stringr,readtext,XML,data.table,ecodata,shinyBS,huxtable,gridExtra,ggplot2,shinyWidgets,readxl,htmltools,knitr,shinydashboard,shinydashboardPlus,gmRi,here,install=TRUE,purrr)
+#pacman::p_load(akima,sdm,writexl,sf)
 here()
 ##### LOAD DATA ######
 source(here("Code/Compile_data.R"))
+
 ##### LOAD supporting functions ########
 source(here("Code/supporting_functions_for_app.R"))
 
