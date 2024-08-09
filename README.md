@@ -51,4 +51,4 @@
   -   The information in this folder is not necessary to run the app, as it is an adjacent project.
 
 
-#### Any further questions can be directed to Jamie Behan: jbehan@gmri.org
+#### Any further questions can be directed to Jamie Behan: jamie.behan@maine.edu

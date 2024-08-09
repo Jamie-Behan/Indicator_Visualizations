@@ -2,6 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+.here
 /papers_writeups/
 /Code/rsconnect/
 /Code/www/striped_bass_4-removebg.png
