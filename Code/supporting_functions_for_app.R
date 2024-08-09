@@ -199,8 +199,8 @@ stripedbass_info<-tabPanel("Range & Info",
                       value of the fishery to the state.",
                     style = "font-size: 18px;text-align: justify;"),
                   h4("For more information, click the link below:", style = "padding-top: 40px;"),
-                  tags$li(HTML('<a href="C:/Users/jbehan/Box/Kerr Lab/Fisheries Science Lab/NCLIM/Indicator_Visualizations/Indicator_Visualizations2/papers_writeups/StripedBassliteraturereview.pdf" style="font-size: 18px;" target="_blank">Environmental Effects on Striped Bass Stock Dynamics</a>')
-                  ))))
+                  tags$a(href = "StripedBassliteraturereview.pdf", "Environmental Effects on Striped Bass Stock Dynamics", target = "_blank")
+                          )))
 BFT_info<-tabPanel("Range & Info",
                            fluidRow(
                              column(width = 4,
@@ -214,8 +214,8 @@ BFT_info<-tabPanel("Range & Info",
                                       and population productivity shifts in the North Atlantic and Mediterranean Sea",
                                       style = "font-size: 18px;text-align: justify;"),
                                     h4("For more information, click the link below:", style = "padding-top: 40px;"),
-                                    tags$li(HTML('<a href="C:/Users/jbehan/Box/Kerr Lab/Fisheries Science Lab/NCLIM/Indicator_Visualizations/Indicator_Visualizations2/papers_writeups/BFTliteraturereview.pdf" style="font-size: 18px;" target="_blank">Environmental Effects on Bluefin Tuna Stock Dynamics</a>')
-                                    ))))
+                                            tags$a(href = "BluefinTuna_literature_review.pdf", "Environmental Effects on Bluefin Tuna Stock Dynamics", target = "_blank")
+                             )))
 AL_info<-tabPanel("Range & Info",
                    fluidRow(
                      column(width = 4,
