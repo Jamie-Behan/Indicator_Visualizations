@@ -16,7 +16,6 @@ library(cli)
 
 #pacman::p_load(shiny,plotly,DT,shinyjs,shinythemes,dplyr,stringr,readtext,XML,data.table,ecodata,shinyBS,huxtable,gridExtra,ggplot2,shinyWidgets,readxl,htmltools,knitr,shinydashboard,shinydashboardPlus,gmRi,here,install=TRUE,purrr)
 #pacman::p_load(akima,sdm,writexl,sf)
-here()
 ##### LOAD DATA ######
 source(here("Code/Compile_data.R"))
 
