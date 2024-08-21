@@ -164,6 +164,33 @@ metadata <-tabItem(tabName = "Metadata",
                          )
                        )
                      ),
+                     #####Bluefin Tuna accordion#####
+                     accordion(
+                       id = "accordion3",
+                       accordionItem(
+                         title = "Atlantic Bluefin Tuna (Thunnus thynnus):",
+                         status = "success",
+                         collapsed = TRUE,
+                         accordionItem(
+                           title = "Bluefin Tuna Spawning Stock Biomass (mt)",
+                           status = "primary",
+                           collapsed = FALSE,
+                           "Atlantic Bluefin Tuna Spawning Stock Biomass (SSB). Units are in metric tons (mt). Data are sourced from the 2021 Atlantic Bluefin Tuna stock assessment. These SSB data were derived from the Stock Synthesis assessment model."
+                         ),
+                         accordionItem(
+                           title = "Bluefin Tuna Recruitment",
+                           status = "primary",
+                           collapsed = FALSE,
+                           "Atlantic Bluefin Tuna Recruitment (abundance). Data represent the number of age 0 fish that survive to the end of their first year of life. Data are sourced from the 2021 Atlantic Bluefin Tuna stock assessment. These data were derived from the Stock Synthesis assessment model."
+                         ),
+                         accordionItem(
+                           title = "Bluefin Tuna Fishing Mortality",
+                           status = "primary",
+                           collapsed = FALSE,
+                           "Atlantic Bluefin Fishing mortality (instantaneous F). Data represent the instantaneous fishing mortality for Bluefin Tuna ages 10-20. Data are sourced from the 2021 Atlantic Bluefin Tuna stock assessment. These data were derived from the Stock Synthesis assessment model."
+                         )
+                       )
+                     ),
                      #####American Lobster accordion#####
                      accordion(
                        id = "accordion3",
