@@ -13,7 +13,8 @@ library(shinyWidgets)
 library(utils)
 library(Rcpp)
 library(cli)
-
+library(graphics)
+library(tidyr)
 #pacman::p_load(shiny,plotly,DT,shinyjs,shinythemes,dplyr,stringr,readtext,XML,data.table,ecodata,shinyBS,huxtable,gridExtra,ggplot2,shinyWidgets,readxl,htmltools,knitr,shinydashboard,shinydashboardPlus,gmRi,here,install=TRUE,purrr)
 #pacman::p_load(akima,sdm,writexl,sf)
 ##### LOAD DATA ######
@@ -107,12 +108,11 @@ ui <- dashboardPage(
                                         width = 6,
                                         h3("Stock Variables", style = "font-weight: bold;"),
                                         h4("Variables related to recruitment", style = "font-weight: bold;"),
-                                        #div(class = "fish-controls",fish_controls(c("Striped_Bass_Age1_Abundance", "Striped_Bass_Female_SSB"),var_name="BFT_recruitment_variable")),
+                                        div(class = "fish-controls",fish_controls(c("Bluefin_Recruitment", "Bluefin_SSB_mt"),var_name="BFT_recruitment_variable")),
                                         h4("Variables related to growth", style = "font-weight: bold;"),
                                         #div(class = "fish-controls",fish_controls(c("Striped_Bass_WAA1_kg", "Striped_Bass_WAA4_kg"),var_name="BFT_growth_variable")),
                                         h4("Other variables", style = "font-weight: bold;"),
-                                        #div(class = "fish-controls",fish_controls(c("Striped_Bass_Total_Abundance", "Striped_Bass_Commercial_Landings",
-                                        #                                            "Striped_Bass_Recreational_Landings", "Striped_Bass_Maine_Recreational_Harvest", "Striped_Bass_Full_F"),var_name="BFT_other_variable")),
+                                        div(class = "fish-controls",fish_controls(c("Bluefin_F"),var_name="BFT_other_variable")),
                                         radioButtons(
                                           "BFT_Plotting_Style",
                                           "Select Plotting Style",
