@@ -31,7 +31,8 @@ ui <- dashboardPage(
   dashboardBody(gmri_colors,
     fluidPage(tweaks,
       tabItems(
-        Hometab, 
+        Hometab,
+        How_To, 
         tabItem(     #Stripedbass tab
           tabName = "StripedBass",
           h2(img(src = "https://www.fisheries.noaa.gov/s3/styles/original/s3/2022-08/640x427-StripedBass-NOAAFisheries.png?itok=4ZQoQM0S",

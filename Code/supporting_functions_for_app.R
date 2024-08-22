@@ -70,7 +70,8 @@ fish_controls <- function(species, selected_vars, var_name) {
 sidebar <- dashboardSidebar(width = 150,
                             tags$style(".left-side, .main-sidebar {padding-top: 100px}"),
                             sidebarMenu(
-                              menuItem("Home", tabName = "Home", icon = icon("house")),
+                              menuItem("Home", tabName = "Home", icon = icon("house")), #look at free icons at fontawesome.com
+                              menuItem(" How To", tabName = "How_To", icon = icon("info-circle")),
                               menuItem("Striped Bass", tabName = "StripedBass", icon = icon("fish")),
                               menuItem("Bluefin Tuna", tabName = "BluefinTuna",icon = icon("fish")),
                               menuItem("American Lobster", tabName = "AmericanLobster",icon = icon("fish")),
@@ -78,14 +79,14 @@ sidebar <- dashboardSidebar(width = 150,
                               
                             )
                             #,
-#                            HTML(paste0(
-#                              "<div style='margin-top: 100px; text-align: center;'>",
-#                              "<a href='https://github.com/Jamie-Behan' target='_blank'>", 
- #                             icon("github", class = "fa-3x"), 
-#                              "<br/>Jamie Behan 2023",
-#                              "</a>",
-#                              "</div>"
-#                            ))
+                            #                            HTML(paste0(
+                            #                              "<div style='margin-top: 100px; text-align: center;'>",
+                            #                              "<a href='https://github.com/Jamie-Behan' target='_blank'>", 
+                            #                             icon("github", class = "fa-3x"), 
+                            #                              "<br/>Jamie Behan 2023",
+                            #                              "</a>",
+                            #                              "</div>"
+                            #                            ))
 )
 ######## define colors#####
 gmri_colors<-tags$head(tags$style(HTML('
@@ -179,6 +180,56 @@ Hometab<-tabItem(
     )
   )
 )#close tabitem
+############ Do's and Dont's Page ###################
+How_To <- tabItem(
+  tabName = "How_To",
+  
+  # Heading in large font size
+  h2(HTML('<strong style="font-size: 40px;">How to Use This Application</strong>')),
+  
+  # Descriptive text in smaller font size and black color
+  tags$p("This page serves to provide guidelines for use for the application, and ways to avoid misuse of this application.",
+         style = "font-size: 20px; color: black;"),
+  
+  # Purpose text in smaller font size and grey color
+  tags$p("This app serves as a data visualization hub, allowing users to sift through species of interest and explore or download relevant 
+       stock and environmental data. On the left side of the screen you will see various species listed. Click on a species and it will 
+       bring you to the species overview page where you can read more about the species. On that page, you will see 2 additional tabs: an 
+       'Interactive Plots' page and a 'Data' page. The 'Interactive Plots' page is designed to be user-interactive, where the plots will 
+       change based on which data are selected. The 'Data' page will show the dataframe of the data selected in the 'Interactive Plots' 
+       page, and there is an option to download the data at the bottom of the 'Data' page. Below the species list on the left hand side 
+       of the screen is a 'Metadata' page listing all of the data varibles found in the 'Interactive Plots' page. Users can explore the 
+       Metadata page to learn more about the data and where it was sourced from.
+       ",
+         style = "font-size: 18px; color: black; text-align: justify; margin-left: auto; margin-right: auto; max-width: 1100px; margin-top: 40px;"),  # Adjust margin-top as needed
+  
+  # Do's and Dont's
+  tags$p("Do Use This App for the Following:",
+         style = "font-size: 24px; color: black; margin-top: 40px;"),
+  
+  # Bulleted list
+  tags$ul(
+    tags$li(style = "font-size: 18px;","Exploring and visualizing patterns or trends in stock-specific and environmental data."),
+    tags$li(style = "font-size: 18px;","Downloading stock-specific or environmental data."),
+    tags$li(style = "font-size: 18px;","Informing fisheries related decision-making processes with up-to-date information."),
+    tags$li(style = "font-size: 18px;","Sharing insights with colleagues and stakeholders.")
+  ),
+  tags$p("Do Not Use This App for the Following:",
+         style = "font-size: 24px; color: black; margin-top: 40px;"),
+  
+  # Bulleted list for Do Not's
+  tags$ul(
+    tags$li(style = "font-size: 18px;","Cherry-picking data to support preconceived conclusions or biases."),
+    tags$li(style = "font-size: 18px;","Assuming that correlation implies causation without further analysis."),
+    tags$li(style = "font-size: 18px;","Using the data out of context, leading to misleading interpretations."),
+    tags$li(style = "font-size: 18px;","Disseminating findings without proper understanding or verification."),
+    tags$li(style = "font-size: 18px;","Ignoring the limitations and uncertainties inherent in the data."),
+    tags$li(style = "font-size: 18px;","Making broad generalizations based on a limited subset of the data.")
+  ),
+  tags$p("We encourage users to explore the app and its data responsibly, adhering to best practices in data usage and scientific inquiry.",
+         style = "font-size: 16px; color: darkgray; text-align: center; font-weight: bold; margin-top: 40px;")
+  
+)
 ####### Species Landing page content #######
 stripedbass_info<-tabPanel("Range & Info",
          fluidRow(
