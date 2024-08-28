@@ -51,7 +51,7 @@ ui <- dashboardPage(
                                       h4("Variables related to recruitment", style = "font-weight: bold;"),
                                       div(class = "fish-controls",fish_controls(c("Striped_Bass_Age1_Abundance", "Striped_Bass_Female_SSB"),var_name="SB_recruitment_variable")),
                                       h4("Variables related to growth", style = "font-weight: bold;"),
-                                      div(class = "fish-controls",fish_controls(c("Striped_Bass_WAA1_kg", "Striped_Bass_WAA4_kg"),var_name="SB_growth_variable")),
+                                      div(class = "fish-controls",fish_controls(c("Striped_Bass_Weight_at_Age_1_kg", "Striped_Bass_Weight_at_Age_4_kg"),var_name="SB_growth_variable")),
                                       h4("Other variables", style = "font-weight: bold;"),
                                       div(class = "fish-controls",fish_controls(c("Striped_Bass_Total_Abundance", "Striped_Bass_Commercial_Landings",
                                                                                   "Striped_Bass_Recreational_Landings", "Striped_Bass_Maine_Recreational_Harvest", "Striped_Bass_Full_F"),var_name="SB_other_variable")),
@@ -111,7 +111,7 @@ ui <- dashboardPage(
                                         h4("Variables related to recruitment", style = "font-weight: bold;"),
                                         div(class = "fish-controls",fish_controls(c("Bluefin_Recruitment", "Bluefin_SSB_mt"),var_name="BFT_recruitment_variable")),
                                         h4("Variables related to growth", style = "font-weight: bold;"),
-                                        #div(class = "fish-controls",fish_controls(c("Striped_Bass_WAA1_kg", "Striped_Bass_WAA4_kg"),var_name="BFT_growth_variable")),
+                                        #div(class = "fish-controls",fish_controls(c("Striped_Bass_Weight_at_Age_1_kg", "Striped_Bass_Weight_at_Age_4_kg"),var_name="BFT_growth_variable")),
                                         h4("Other variables", style = "font-weight: bold;"),
                                         div(class = "fish-controls",fish_controls(c("Bluefin_F"),var_name="BFT_other_variable")),
                                         radioButtons(
