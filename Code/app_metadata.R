@@ -40,6 +40,22 @@ metadata <-tabItem(tabName = "Metadata",
                        ),
                        
                        accordionItem(
+                         title = "Forage Fish Index",
+                         status = "primary",
+                         "Biomass index of 20 small pelagic forage fish speices. The approach used to generate these data include survey-sampled predator stomach 
+                         contents as observations to develop a survey index for forage fish, following Ng et al. (2021). The 20 species selected were targeted 
+                         Bluefish (Pomatomus saltatrix) prey fish and include: Longfin squids (Doryteuthis formerly Loligo sp.), Anchovy family (Engraulidae), 
+                         bay anchovy (Anchoa mitchilli), Atlantic butterfish, (Peprilus triachanthus), Cephalopoda, (Anchoa hepsetus), red eye round herring 
+                         (Etrumeus teres), Sandlance (Ammodytes sp.), scup (Stenotomus chrysops), silver hake (Merluccius bilinearis), shortfin squids (Illex sp.), 
+                         Atlantic herring (Clupea harengus), Herring family (Clupeidae), Bluefish (Pomatomus saltatrix), silver anchovy (Engraulis eurystole), 
+                         longfin inshore squid (Doryteuthis pealeii), Atlantic mackerel (Scomber scombrus), flatfish (Pleuronectiformes), weakfish (Cynoscion regalis), 
+                         and Atlantic menhaden (Brevoortia tyrannus). Predators with highest diet similarity to Bluefish from the NEFSC diet database (1973-2020) 
+                         include Atlantic cod, Atlantic halibut, buckler dory, cusk, fourspot flounder, goosefish, longfin squid, shortfin squid, pollock, red hake, 
+                         sea raven, silver hake, spiny dogfish, spotted hake, striped bass, summer flounder, thorny skate, weakfish, and white hake.
+                         These data were sourced from the R package 'ecodata'. See https://noaa-edab.github.io/tech-doc/forage_index.html?q=forage#forage_index for more info. "
+                       ),
+                       
+                       accordionItem(
                          title = "Median Cholorphyll A",
                          status = "primary",
                          "time series of remotely sensed chlorophyll a (CHL) from the Northeast Continental Shelf region. Data are from multiple sensors (OC-CCI, SeaWiFS, MODIS-Aqua) and sourced from the R package 'ecodata'. See https://noaa-edab.github.io/tech-doc/ for more info. "
@@ -74,13 +90,13 @@ metadata <-tabItem(tabName = "Metadata",
                          "North Atlantic Oscillation (NAO). Unit-less. 1864-present. Data are sourced from the R package 'ecodata'. 
                                           See https://noaa-edab.github.io/tech-doc/ for more info."
                        ),
-                       accordionItem(
-                         title = "OISST Anomaly (Season)",
-                         status = "primary",
-                         "SST anomalies for the GOM region for either the winter, spring, summer, or fall season. These data were derived from the NOAA Optimum Interpolation SST High Resolution data set (NOAA OISST V2). 
-                                          The 1982-2020 climatology was used to calculate anomalies.1982-present. In ℃.  Data are sourced from the R package 'ecodata'. 
-                                          See https://noaa-edab.github.io/tech-doc/ for more info."
-                       ),
+#                       accordionItem(
+#                         title = "OISST Anomaly (Season)",
+#                         status = "primary",
+#                         "SST anomalies for the GOM region for either the winter, spring, summer, or fall season. These data were derived from the NOAA Optimum Interpolation SST High Resolution data set (NOAA OISST V2). 
+#                                          The 1982-2020 climatology was used to calculate anomalies.1982-present. In ℃.  Data are sourced from the R package 'ecodata'. 
+#                                          See https://noaa-edab.github.io/tech-doc/ for more info."
+#                       ),
                        accordionItem(
                          title = "In-situ SST Anomaly (NEFSC)",
                          status = "primary",
