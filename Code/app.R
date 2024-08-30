@@ -239,24 +239,45 @@ server <- function(input, output, session) {
     plot_function(plottingstyle = input$AL_Plotting_Style,num_variables=num_variables, dataDf=dataDf, all_vars=all_vars, name_mapping=name_mapping, name_mapping2=name_mapping2, show_trendline=input$trendline_AL)
   })#close renderPlotly
   
+# Define reactive expressions for data subsets
+  table_subset_SB <- reactive({
+    all_varsY <- c("Year", input$SB_recruitment_variable, input$SB_distribution_variable, 
+                   input$SB_growth_variable, input$SB_other_variable, input$SB_Abiotic_variable, 
+                   input$SB_Biotic_variable)
+    datatable_function(all_varsY = all_varsY)  # Return raw data
+  })
+  table_subset_BFT <- reactive({
+    all_varsY <- c("Year", input$BFT_recruitment_variable, input$BFT_distribution_variable, 
+                   input$BFT_growth_variable, input$BFT_other_variable, input$BFT_Abiotic_variable, 
+                   input$BFT_Biotic_variable)
+    datatable_function(all_varsY = all_varsY)  # Return raw data
+  })
+  table_subset_AL <- reactive({
+    all_varsY <- c("Year", input$AL_recruitment_variable, input$AL_distribution_variable, 
+                   input$AL_growth_variable, input$AL_other_variable, input$AL_Abiotic_variable, 
+                   input$AL_Biotic_variable)
+    datatable_function(all_varsY = all_varsY)  # Return raw data
+  })
+  
+# Render DataTables
   output$mytable_SB <- DT::renderDataTable({
-    all_varsY <- c("Year", input$SB_recruitment_variable, input$SB_growth_variable, input$SB_other_variable, input$SB_Abiotic_variable, input$SB_Biotic_variable)
-    datatable_function(all_varsY=all_varsY)
+    table_subset_SB()
   })
   output$mytable_BFT <- DT::renderDataTable({
-    all_varsY <- c("Year", input$BFT_recruitment_variable,input$BFT_growth_variable,input$BFT_other_variable, input$BFT_Abiotic_variable,input$BFT_Biotic_variable)
-    datatable_function(all_varsY=all_varsY)
+    table_subset_BFT()
   })
   output$mytable_AL <- DT::renderDataTable({
-    all_varsY <- c("Year", input$AL_recruitment_variable,input$AL_distribution_variable,input$AL_other_variable, input$AL_Abiotic_variable,input$AL_Biotic_variable)
-    datatable_function(all_varsY=all_varsY)
+    table_subset_AL()
   })
+  
+# Download handlers for CSV files
   output$downloadCSV_SB <- downloadHandler(
     filename = function() {
       paste("Stripedbass_indicator_data", Sys.Date(), ".csv", sep = "")
     },
     content = function(file) {
-      write.csv(table_subset, file)
+      data <- table_subset_SB()  # Get raw data
+      write.csv(data, file, row.names = FALSE)  # Save as CSV
     }
   )
   output$downloadCSV_BFT <- downloadHandler(
@@ -264,7 +285,8 @@ server <- function(input, output, session) {
       paste("Bluefin_indicator_data", Sys.Date(), ".csv", sep = "")
     },
     content = function(file) {
-      write.csv(table_subset, file)
+      data <- table_subset_BFT()  # Get raw data
+      write.csv(data, file, row.names = FALSE)  # Save as CSV
     }
   )
   output$downloadCSV_AL <- downloadHandler(
@@ -272,7 +294,8 @@ server <- function(input, output, session) {
       paste("Lobster_indicator_data", Sys.Date(), ".csv", sep = "")
     },
     content = function(file) {
-      write.csv(table_subset, file)
+      data <- table_subset_AL()  # Get raw data
+      write.csv(data, file, row.names = FALSE)  # Save as CSV
     }
   )
 } # server

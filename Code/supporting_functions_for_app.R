@@ -607,10 +607,8 @@ plot_ly() %>%
   }}
 
 ################ function for datatable ####################
-datatable_function<-function(all_varsY=all_varsY){
-
+datatable_function <- function(all_varsY = all_varsY) {
   table_subset <- Both2[, all_varsY, drop = FALSE]
-
   
   # Find the starting year based on the second oldest column
   start_year <- min(which(!is.na(table_subset$Year)))  # Initialize start year with the first non-NA year
@@ -621,10 +619,13 @@ datatable_function<-function(all_varsY=all_varsY){
     start_year <- min(data_start_years)
   } else {
     # Find the second oldest column and update start_year if necessary
-    start_year <- sort(unique(data_start_years))[2]}
+    start_year <- sort(unique(data_start_years))[2]
+  }
   # Subset the data from the start_year to the end
   table_subset <- table_subset[start_year:nrow(table_subset), ]
   # Replace column names with prettier name labels
   colnames(table_subset) <- name_mapping[colnames(table_subset)]
-  DT::datatable(table_subset,options = list(pageLength = 30))
-  }
+  
+  # Return raw data
+  return(table_subset)
+}
