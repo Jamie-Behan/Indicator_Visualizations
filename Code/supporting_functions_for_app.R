@@ -322,22 +322,31 @@ for (col_name in colnames(Both2)) {
   y_name <- gsub("^\\s+|\\s+$", "", y_name)  # Remove leading and trailing spaces
   y_name <- gsub("\\s+", " ", y_name)  # Reduce multiple spaces to a single space
   
-  # Modify Yname based on additional conditions for Yname2
+  # Modify Yname based on additional conditions for Yname2 (y_name2 will be used to reduce datanames shown as plot titles to the associated units on the yaxis)
   y_name2 <- gsub("\\b(Atlantic|River|American|Landings|Striped Bass|lobster|Biomass)\\b", "", y_name)
-  y_name2 <- gsub("\\bAbundance\\b", "Abun.", y_name2)
-  y_name2 <- gsub("\\bCommercial\\b", "Comm.", y_name2)
-  y_name2 <- gsub("\\bRecreational\\b", "Rec.", y_name2)
-  y_name2 <- gsub("\\bFall\\b", "FL", y_name2)
-  y_name2 <- gsub("\\bSpring\\b", "SP", y_name2)
-  y_name2 <- gsub("\\bCopepods\\b", "Copepod", y_name2)
-  y_name2 <- gsub("\\bBottom Temp\\b", "bt", y_name2)
-  y_name2 <- gsub("\\bAnomaly\\b", "", y_name2)
-  y_name2 <- gsub("\\bAbsolute\\b", "Abs.", y_name2)
-  y_name2 <- gsub("\\bLarge\\b", "Lg", y_name2)
-  y_name2 <- gsub("\\bSmall\\b", "Sm", y_name2)
-  y_name2 <- gsub("\\bherring\\b", "Herring", y_name2, ignore.case = TRUE)
-  y_name2 <- gsub("^\\s+|\\s+$", "", y_name2)  # Remove leading and trailing spaces
-  y_name2 <- gsub("\\s+", " ", y_name2)  # Reduce multiple spaces to a single space
+  y_name2 <- ifelse(grepl("\\bAbundance\\b", y_name), "(Numbers)", y_name2)
+  y_name2 <- ifelse(grepl("\\bAbundance Anomaly\\b", y_name), "(Δ Numbers)", y_name2)
+  y_name2 <- ifelse(grepl("\\bLandings\\b", y_name), "(mt)", y_name2)
+  y_name2 <- ifelse(grepl("\\bSSB\\b", y_name), "(mt)", y_name2)
+  y_name2 <- ifelse(grepl("\\bHarvest\\b", y_name), "(Fish/Year)", y_name2)
+  y_name2 <- ifelse(grepl("\\bWeight at Age\\b", y_name), "(kg)", y_name2)
+  y_name2 <- ifelse(grepl("\\bRecruitment\\b", y_name), "(Numbers)", y_name2)
+  y_name2 <- ifelse(grepl("\\b F\\b", y_name), "(%)", y_name2)
+  y_name2 <- ifelse(grepl("\\bAMO\\b", y_name), "(C Anomaly)", y_name2)
+  y_name2 <- ifelse(grepl("\\bLatitude\\b", y_name), "(Decimal Degrees)", y_name2)
+  y_name2 <- ifelse(grepl("\\bLat\\b", y_name), "(Decimal Degrees)", y_name2)
+  y_name2 <- ifelse(grepl("\\bDepth\\b", y_name), "(meters)", y_name2)
+  y_name2 <- ifelse(grepl("\\bAbsolute\\b", y_name), "(C)", y_name2)
+  y_name2 <- ifelse(grepl("\\bTemperature\\b", y_name), "(C Anomaly)", y_name2)
+  y_name2 <- ifelse(grepl("\\bTemp Anomaly\\b", y_name), "(C Anomaly)", y_name2)
+  y_name2 <- ifelse(grepl("\\bCalanus\\b", y_name), "(Abundance Anomaly)", y_name2)
+  y_name2 <- ifelse(grepl("\\bForage\\b", y_name), "(Abundance)", y_name2)
+  y_name2 <- ifelse(grepl("\\bGSI\\b", y_name), "(Δ Degrees Latitude)", y_name2)
+  y_name2 <- ifelse(grepl("\\bNAO\\b", y_name), "(NAO; Unitless)", y_name2)
+  y_name2 <- ifelse(grepl("\\bHudson River Flow Rate\\b", y_name), "(m3/s)", y_name2)
+  y_name2 <- ifelse(grepl("\\bSurface Salinty\\b", y_name), "(so[10^-3])", y_name2)
+  y_name2 <- ifelse(grepl("\\bCalfin anomaly\\b", y_name), "(Δ Numbers)", y_name2)
+  
   
   # Add a new row to the new dataframe
   new_df <- rbind(new_df, data.frame(Data_name = col_name, Data_type = data_type, Yname = y_name, Yname2 = y_name2, stringsAsFactors = FALSE))
@@ -542,12 +551,11 @@ plot_ly() %>%
 
     }}#close if layered option
   else {
-
+   
     plot_list <- lapply(1:num_variables, function(i) {
-      # Use name_mapping to get the correct Yname for the variable
       y_name <- name_mapping[all_vars[i]]
       y_name2 <- name_mapping2[all_vars[i]]
-
+      
       if (show_trendline) {
         trendline_model <- lm(as.formula(paste0(all_vars[i], " ~ Year")), data = dataDf(), na.action = na.exclude)
         trendline_values <- predict(trendline_model, newdata = data.frame(Year = dataDf()$Year))
@@ -555,19 +563,47 @@ plot_ly() %>%
         trendline_values <- rep(NA, nrow(dataDf()))
       }
       
-      plot_ly(dataDf(), x = ~Year, y = ~get(all_vars[i]), 
-              type = 'scatter', mode = 'lines', name = y_name) %>%
+      plot <- plot_ly(dataDf(), x = ~Year, y = ~get(all_vars[i]), 
+                      type = 'scatter', mode = 'lines', name = y_name, showlegend = FALSE) %>% 
         add_trace(x = ~Year, y = ~trendline_values,
                   type = 'scatter', mode = 'lines', name = paste(y_name, "Trend"),
-        line = list(dash = 'dash',width = 0.5, color = "#000000")) %>%
-        layout(yaxis = list(title = y_name2, side = 'left', showgrid = FALSE, zerolinecolor = '#bdbdbd', zerolinewidth = 1.5))
+                  line = list(dash = 'dash', width = 0.5, color = "#000000"),
+                  showlegend = FALSE) %>%
+        layout(
+          yaxis = list(title = y_name2, side = 'left', showgrid = FALSE, zerolinecolor = '#bdbdbd', zerolinewidth = 1.5),
+          xaxis = list(showgrid = FALSE),
+          annotations = list(
+            list(
+              text = y_name,
+              x = 0,  # Position in the top left corner
+              y = 1,  # Position at the top of the plot area
+              xref = "paper",
+              yref = "paper",
+              xanchor = "left",
+              yanchor = "top",
+              showarrow = FALSE,
+              font = list(size = 14)
+            )
+          )
+        )
+      
+      return(plot)
     })
     
+    # Combine all plots into a subplot
     fig <- subplot(plot_list, nrows = num_variables, shareX = TRUE, titleY = TRUE, 
                    titleX = TRUE, margin = 0.03)
     
-    layout(fig, xaxis = list(title = "Year", showgrid = FALSE),
-           plot_bgcolor = '#e5ecf6')
+    # Apply global layout settings
+    fig <- fig %>%
+      layout(
+        xaxis = list(title = "Year", showgrid = FALSE),
+        plot_bgcolor = '#e5ecf6'
+      )
+    
+    # Display the figure
+    fig
+    
   }}
 
 ################ function for datatable ####################
