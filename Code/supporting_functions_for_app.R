@@ -234,7 +234,8 @@ How_To <- tabItem(
 stripedbass_info<-tabPanel("Range & Info",
          fluidRow(
            column(width = 4,
-                  HTML('<div style="width: 100%; height: 400px; background-color: black; margin-top: 30px;"></div>')),
+                  tags$img(src = "Stripedbass_range2.png", 
+                           style = "width: 100%; height: 100%; object-fit: cover; margin-top: 30px;")),
            column(width = 8,
                   h3("Overview"),
                   p("Striped bass is an anadromous species native to the northeastern and central Atlantic coast of the United States and has a complex 
@@ -255,7 +256,8 @@ stripedbass_info<-tabPanel("Range & Info",
 BFT_info<-tabPanel("Range & Info",
                            fluidRow(
                              column(width = 4,
-                                    HTML('<div style="width: 100%; height: 400px; background-color: black; margin-top: 30px;"></div>')),
+                                    tags$img(src = "BFT_range2.png", 
+                                             style = "width: 100%; height: 100%; object-fit: cover; margin-top: 30px;")),
                              column(width = 8,
                                     h3("Overview"),
                                     p("Atlantic bluefin tuna (Thunnus thynnus) are a large, migratory species, managed by ICCAT as east (Mediterranean spawning)
@@ -270,7 +272,8 @@ BFT_info<-tabPanel("Range & Info",
 AL_info<-tabPanel("Range & Info",
                    fluidRow(
                      column(width = 4,
-                            HTML('<div style="width: 100%; height: 400px; background-color: black; margin-top: 30px;"></div>')),
+                            tags$img(src = "Lobster_range.png", 
+                                     style = "width: 100%; height: 100%; object-fit: cover; margin-top: 30px;")),
                      column(width = 8,
                             h3("Overview"),
                             p("American Lobster (Homarus americanus) is a benthic crustacean whose range extends along the Atlantic coast from the Mid-Atlantic region of the US to 
