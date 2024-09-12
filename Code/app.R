@@ -1,7 +1,10 @@
 #### Load R packages ######
 #if (!require("remotes")) install.packages("remotes")
 #remotes::install_github("gulfofmaine/gmRi")
+library(remotes)
 #remotes::install_github("noaa-edab/ecodata",build_vignettes=TRUE)
+#pak::pkg_install("noaa-edab/ecodata")
+library(ecodata)
 library(here)
 library(DT)
 library(shiny)
