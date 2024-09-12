@@ -5,7 +5,7 @@ pacman::p_load(dplyr,terra,utils,install=TRUE)
 ####### Load in diamap .csv files from dismap folder ##########
 # Set the directory path where your .csv files are located
 
-csv_files <- list.files("C:/Users/crazi/Box/Kerr Lab/Fisheries Science Lab/NCLIM/Indicator_Visualizations/Indicator_Visualizations2/Data/DisMAP", pattern = "\\.csv$", full.names = TRUE) # Get a list of all .csv files in the folder
+csv_files <- list.files(here("Data/DisMAP"), pattern = "\\.csv$", full.names = TRUE) # Get a list of all .csv files in the folder
 data_frames <- list() # Initialize an empty list to store the data frames
 
 # Loop through the list of .csv files and read each file as a data frame
