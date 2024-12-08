@@ -36,11 +36,12 @@ bluefin_data <- bluefin_data %>%
     Bluefin_F = F,
     Bluefin_Recruitment = Recr
   )
-
+##### Load in American Plaice Data from stock assessment reports and Dismap ######
+Plaice_data<-readxl::read_excel(here("Data/American_plaice.xlsx"))
 ####### load in DisMAP data######
 source(here("Code/Dismap_data.R"))
 #################################### Merge all dfs ##############################################################
-Both <- list(big_ecodata, salinity_data,stock_assess_data,DisMAPdata,bluefin_data)
+Both <- list(big_ecodata, salinity_data,stock_assess_data,DisMAPdata,bluefin_data,Plaice_data)
 Both <-Reduce(function(x, y) merge(x, y, by="Year",all=T), Both)
 Both <-Both[rowSums(is.na(Both)) != ncol(Both), ] #removes rows containing all NAs
 
@@ -49,7 +50,7 @@ Both <-Both[rowSums(is.na(Both)) != ncol(Both), ] #removes rows containing all N
 #Both2<-as.data.frame(big_ecodata)
 Both2<-as.data.frame(Both[c(1:19,31:34)]) #dismap herring data is being treated as ENV var and lobster data as fish data
 Both2<-Both2[ , order(names(Both2))]
-Both2 <- list(Both[1],Both2, stock_assess_data,DisMAPdata[c(1,2,3,8,9)],bluefin_data)
+Both2 <- list(Both[1],Both2, stock_assess_data,DisMAPdata[c(1,2,3,8,9)],bluefin_data,Plaice_data)
 Both2 <-Reduce(function(x, y) merge(x, y, by="Year",all=T), Both2)
 Both2 <-Both2[rowSums(is.na(Both2)) != ncol(Both2), ] #removes rows containing all NAs
 #the Both2 df is the same as "Both", but Env data is organized in alphabetical order

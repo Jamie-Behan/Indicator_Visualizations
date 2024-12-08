@@ -1,3 +1,4 @@
+#### This one is not in the Deploy shiny folder#####
 #### Load R packages ######
 #if (!require("remotes")) install.packages("remotes")
 #remotes::install_github("gulfofmaine/gmRi")
@@ -213,6 +214,59 @@ ui <- dashboardPage(
                                   )
                                   
                       ))), #close tabitem
+        tabItem(
+          tabName = "AmericanPlaice",
+          h2(
+            img(src = "https://i.ibb.co/pnqcby9/american-plaice-oil1removebg.png", style = "width: 250px; height: auto; vertical-align: middle; margin-right: 10px;"),
+            HTML('<strong style="font-size: 40px;">American Plaice</strong> (<em>Hippoglossoides platessoides</em>)')),
+          mainPanel(width = 12,
+                    tabsetPanel(type = "tabs",
+                                AP_info, #text that shows up on info page for plaice tab. code located in "supporting_functions_for_app.R"
+                                tabPanel(
+                                  "Interactive Plots",
+                                  h2("Choose Stock and Environmental Variables", style = "font-weight: bold;"),
+                                  fluidRow(
+                                    column(
+                                      width = 6,
+                                      h3("Stock Variables", style = "font-weight: bold;"),
+                                      h4("Variables related to recruitment", style = "font-weight: bold;"),
+                                      div(class = "fish-controls",fish_controls(c("Plaice_Stock_Numbers", "Plaice_Spring_numtow","Plaice_Fall_numtow","Plaice_SSB_Spring","Plaice_SSB_Fall"),var_name="AP_recruitment_variable")),
+                                      h4("Variables related to Distribution", style = "font-weight: bold;"),
+                                      div(class = "fish-controls",fish_controls(c("Plaice_depth_Spring","Plaice_Lat_Spring","Plaice_depth_Fall","Plaice_Lat_Fall"),var_name="AP_distribution_variable")),
+                                      h4("Other variables", style = "font-weight: bold;"),
+                                      div(class = "fish-controls",fish_controls(c("Plaice_Mean_Condition_Fall"),var_name="AP_other_variable")),
+                                      radioButtons(
+                                        "AP_Plotting_Style",
+                                        "Select Plotting Style",
+                                        choices = c("Layered (Choose up to 5 Variables)" = "Layered", "Stacked" = "Stacked"),
+                                        selected = "Stacked"
+                                      ),
+                                      prettySwitch(
+                                        inputId = "trendline_AP",
+                                        label = "Show Trendline(s)",
+                                        fill = TRUE, 
+                                        status = "primary"
+                                      )
+                                    ),
+                                    column(
+                                      width = 6,
+                                      h3("Environmental Variables", style = "font-weight: bold;"),
+                                      h4("Abiotic", style = "font-weight: bold;"),
+                                      div(class = "fish-controls",fish_controls(c("Annual_Bottom_Temp_Absolute_GOM","SST_Temp_Anomaly_GOM",
+                                                                                  "Bottom_Temp_Anomaly_GOM","GLORYS_Bottom_Temp_Anomaly_GOM"),var_name="AP_Abiotic_variable"))
+                                    )),
+                                  mainPanel(
+                                    width = 12,
+                                    plotlyOutput("AP_plot",
+                                                 height = "650px")
+                                  )),
+                                tabPanel("Data", 
+                                         mainPanel(width = 12,
+                                                   DT::dataTableOutput("mytable_AP"),
+                                                   downloadButton("downloadCSV_AP", "Download .CSV"))
+                                )
+                                
+                    ))), #close tabitem
         ####Source metadata code ####
         source(here("Code/app_metadata.R"), local = TRUE)$value
       )#close tabItems
@@ -241,6 +295,11 @@ server <- function(input, output, session) {
     all_vars<-c(input$AL_recruitment_variable,input$AL_distribution_variable,input$AL_other_variable, input$AL_Abiotic_variable,input$AL_Biotic_variable)
     plot_function(plottingstyle = input$AL_Plotting_Style,num_variables=num_variables, dataDf=dataDf, all_vars=all_vars, name_mapping=name_mapping, name_mapping2=name_mapping2, show_trendline=input$trendline_AL)
   })#close renderPlotly
+  output$AP_plot <- renderPlotly({
+    num_variables <- length(c(input$AP_recruitment_variable,input$AP_distribution_variable,input$AP_other_variable, input$AP_Abiotic_variable,input$AP_Biotic_variable))
+    all_vars<-c(input$AP_recruitment_variable,input$AP_distribution_variable,input$AP_other_variable, input$AP_Abiotic_variable,input$AP_Biotic_variable)
+    plot_function(plottingstyle = input$AP_Plotting_Style,num_variables=num_variables, dataDf=dataDf, all_vars=all_vars, name_mapping=name_mapping, name_mapping2=name_mapping2, show_trendline=input$trendline_AP)
+  })#close renderPlotly
   
 # Define reactive expressions for data subsets
   table_subset_SB <- reactive({
@@ -261,6 +320,12 @@ server <- function(input, output, session) {
                    input$AL_Biotic_variable)
     datatable_function(all_varsY = all_varsY)  # Return raw data
   })
+  table_subset_AP <- reactive({
+    all_varsY <- c("Year", input$AP_recruitment_variable, input$AP_distribution_variable, 
+                   input$AP_growth_variable, input$AP_other_variable, input$AP_Abiotic_variable, 
+                   input$AP_Biotic_variable)
+    datatable_function(all_varsY = all_varsY)  # Return raw data
+  })
   
 # Render DataTables
   output$mytable_SB <- DT::renderDataTable({
@@ -271,6 +336,9 @@ server <- function(input, output, session) {
   })
   output$mytable_AL <- DT::renderDataTable({
     table_subset_AL()
+  })
+  output$mytable_AP <- DT::renderDataTable({
+    table_subset_AP()
   })
   
 # Download handlers for CSV files
@@ -298,6 +366,15 @@ server <- function(input, output, session) {
     },
     content = function(file) {
       data <- table_subset_AL()  # Get raw data
+      write.csv(data, file, row.names = FALSE)  # Save as CSV
+    }
+  )
+  output$downloadCSV_AP <- downloadHandler(
+    filename = function() {
+      paste("Plaice_indicator_data", Sys.Date(), ".csv", sep = "")
+    },
+    content = function(file) {
+      data <- table_subset_AP()  # Get raw data
       write.csv(data, file, row.names = FALSE)  # Save as CSV
     }
   )

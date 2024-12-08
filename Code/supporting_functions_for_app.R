@@ -9,7 +9,7 @@ library(shinydashboard)
 library(DT)
 library(terra)
 library(utils)
-###### tweaks, a list object to set up multiple-columns for checkboxGroupInput#####
+###### tweaks, a list object to set up multiple-columns for checkboxGroupInput #############
 tweaks <- list(
   tags$head(
     tags$style(HTML("
@@ -27,7 +27,7 @@ tweaks <- list(
 )
 
 
-##### pick fish data: the checkboxes will control the data values plotted ######
+##### pick fish data: the checkboxes will control the data values plotted #########
 fish_controls <- function(species, selected_vars, var_name) {
   filtered_columns <- grep(paste(species, collapse = "|"), colnames(Both2), value = TRUE)
   sorted_filtered_columns <- sort(filtered_columns)
@@ -38,7 +38,7 @@ fish_controls <- function(species, selected_vars, var_name) {
   conditionNames<- gsub("\\s+", " ", conditionNames) # Reduce multiple spaces to a single space
   conditionNames<- gsub("\\bLat\\b", "Latitude", conditionNames) #Write out Latitude fully
   conditionNames<- gsub("\\bCalfin anomaly\\b", "C. finmarchicus Anomaly", conditionNames) #Write out recognizable calanus abbreviation
-
+  
   
   container_height <- ifelse(num_checkboxes <= 2, 45, 
                              ifelse(num_checkboxes %% 2 == 0, 
@@ -66,7 +66,7 @@ fish_controls <- function(species, selected_vars, var_name) {
   
   return(controls)
 }
-########create sidebar: #########
+########create sidebar: ##############
 sidebar <- dashboardSidebar(width = 150,
                             tags$style(".left-side, .main-sidebar {padding-top: 100px}"),
                             sidebarMenu(
@@ -75,6 +75,7 @@ sidebar <- dashboardSidebar(width = 150,
                               menuItem("Striped Bass", tabName = "StripedBass", icon = icon("fish")),
                               menuItem("Bluefin Tuna", tabName = "BluefinTuna",icon = icon("fish")),
                               menuItem("American Lobster", tabName = "AmericanLobster",icon = icon("fish")),
+                              menuItem("American Plaice", tabName = "AmericanPlaice",icon = icon("fish")),
                               menuItem("Metadata", tabName = "Metadata",icon = icon("list"))
                               
                             )
@@ -88,7 +89,7 @@ sidebar <- dashboardSidebar(width = 150,
                             #                              "</div>"
                             #                            ))
 )
-######## define colors#####
+######## define colors #############
 gmri_colors<-tags$head(tags$style(HTML('
         /* main sidebar */
         .skin-blue .main-sidebar {
@@ -103,7 +104,7 @@ gmri_colors<-tags$head(tags$style(HTML('
         background-color: #E9E9E9;
         }
         ')))
-########## Add header logos ###########
+########## Add header logos #############
 headerlogos<-    tags$li(
   div(
     style = "display: flex; align-items: center;",
@@ -128,7 +129,7 @@ headerlogos<-    tags$li(
   tags$style(".main-header {max-height: 100px}"),
   tags$style(".main-header .logo {height: 100px}")
 )
-############ Home Tab #########
+############ Home Tab ###################
 Hometab<-tabItem(
   tabName = "Home",
   fluidPage(
@@ -145,7 +146,7 @@ Hometab<-tabItem(
         padding-top: 35px; /* Add a small buffer (adjust the value according to your preference) */
         position: relative; /* Set position to relative for proper placement of the image */
       }
-      .overlay {
+      .home-overlay {
         position: absolute;
         top: 0;
         left: 25;
@@ -172,7 +173,7 @@ Hometab<-tabItem(
     ")),
     div(class = "home-background",
         img(src = "coastal-excursion-aerial.jpg", class = "boat-image", width = "2100px"),  # Add the boat image here
-        div(class = "overlay"),  # Add overlay here
+        div(class = "home-overlay"),  # Add overlay here
         div(class = "home-content",
             tags$h1("Monitoring Ecosystem Change to Support Fisheries Decision-Making in Maine's Coastal Waters", style = "font-size: 36px;"),
             tags$p("Warming in Maine’s coastal waters is reshaping the ecosystem and impacting key fishery resources and communities. Information on the state of the ecosystem will improve our ability to make informed decisions in the face of climate change and support a holistic, ecosystem-based approach to managing Maine’s marine resources. The goal of this study is to develop an integrated ecosystem assessment (IEA) focused on characterizing the status and trends of the fishery ecosystem in Maine’s coastal waters.", style = "font-size: 18px;")
@@ -230,15 +231,20 @@ How_To <- tabItem(
          style = "font-size: 16px; color: darkgray; text-align: center; font-weight: bold; margin-top: 40px;")
   
 )
-####### Species Landing page content #######
+
+
+
+#            tags$p("This page serves to provide guidelines for use for the application, and ways to avoid misuse of this application.", style = "font-size: 18px;")
+
+####### Species Landing page content ######################
 stripedbass_info<-tabPanel("Range & Info",
-         fluidRow(
-           column(width = 4,
-                  tags$img(src = "Stripedbass_range2.png", 
-                           style = "width: 100%; height: 100%; object-fit: cover; margin-top: 30px;")),
-           column(width = 8,
-                  h3("Overview"),
-                  p("Striped bass is an anadromous species native to the northeastern and central Atlantic coast of the United States and has a complex 
+                           fluidRow(
+                             column(width = 4,
+                                    tags$img(src = "Stripedbass_range2.png", 
+                                             style = "width: 100%; height: 100%; object-fit: cover; margin-top: 30px;")),
+                             column(width = 8,
+                                    h3("Overview"),
+                                    p("Striped bass is an anadromous species native to the northeastern and central Atlantic coast of the United States and has a complex 
                       life cycle involving spawning in coastal rivers and estuaries, followed by long-range migrations to feeding and overwintering 
                       grounds. In Maine, striped bass fishing is a popular recreational activity, with the recreational harvest of striped bass routinely 
                       surpassing that of the commercial harvest. Historically, striped bass spawned in numerous rivers along coastal New England, but now 
@@ -249,34 +255,34 @@ stripedbass_info<-tabPanel("Range & Info",
                       (Peer and Miller 2014; Secor et al. 2020). Changes in the timing and persistence of ecologically and economically important 
                       migratory species such as striped bass can lead to implications to both the management of this species, as well as the economic 
                       value of the fishery to the state.",
-                    style = "font-size: 18px;text-align: justify;"),
-                  h4("For more information, click the link below:", style = "padding-top: 40px;"),
-                  tags$a(href = "StripedBassliteraturereview.pdf", "Environmental Effects on Striped Bass Stock Dynamics", target = "_blank")
-                          )))
+                                      style = "font-size: 18px;text-align: justify;"),
+                                    h4("For more information, click the link below:", style = "padding-top: 40px;"),
+                                    tags$a(href = "StripedBassliteraturereview.pdf", "Environmental Effects on Striped Bass Stock Dynamics", target = "_blank")
+                             )))
 BFT_info<-tabPanel("Range & Info",
-                           fluidRow(
-                             column(width = 4,
-                                    tags$img(src = "BFT_range2.png", 
-                                             style = "width: 100%; height: 100%; object-fit: cover; margin-top: 30px;")),
-                             column(width = 8,
-                                    h3("Overview"),
-                                    p("Atlantic bluefin tuna (Thunnus thynnus) are a large, migratory species, managed by ICCAT as east (Mediterranean spawning)
+                   fluidRow(
+                     column(width = 4,
+                            tags$img(src = "BFT_range2.png", 
+                                     style = "width: 100%; height: 100%; object-fit: cover; margin-top: 30px;")),
+                     column(width = 8,
+                            h3("Overview"),
+                            p("Atlantic bluefin tuna (Thunnus thynnus) are a large, migratory species, managed by ICCAT as east (Mediterranean spawning)
                                       and west (Gulf of Mexico spawning) stocks, with evidence of spawning activity in the Slope Sea off the Mid Atlantic Bight 
                                       (Richardson et al. 2016a, Richardson et al. 2016b, Hernandez et al. 2022).Climate change impacts, such as warming, acidification, 
                                       and changing ocean dynamics, are affecting their traditional spawning and feeding habitats, potentially leading to ecosystem 
                                       and population productivity shifts in the North Atlantic and Mediterranean Sea",
-                                      style = "font-size: 18px;text-align: justify;"),
-                                    h4("For more information, click the link below:", style = "padding-top: 40px;"),
-                                            tags$a(href = "BluefinTuna_literature_review.pdf", "Environmental Effects on Bluefin Tuna Stock Dynamics", target = "_blank")
-                             )))
+                              style = "font-size: 18px;text-align: justify;"),
+                            h4("For more information, click the link below:", style = "padding-top: 40px;"),
+                            tags$a(href = "BluefinTuna_literature_review.pdf", "Environmental Effects on Bluefin Tuna Stock Dynamics", target = "_blank")
+                     )))
 AL_info<-tabPanel("Range & Info",
-                   fluidRow(
-                     column(width = 4,
-                            tags$img(src = "Lobster_range.png", 
-                                     style = "width: 100%; height: 100%; object-fit: cover; margin-top: 30px;")),
-                     column(width = 8,
-                            h3("Overview"),
-                            p("American Lobster (Homarus americanus) is a benthic crustacean whose range extends along the Atlantic coast from the Mid-Atlantic region of the US to 
+                  fluidRow(
+                    column(width = 4,
+                           tags$img(src = "Lobster_range.png", 
+                                    style = "width: 100%; height: 100%; object-fit: cover; margin-top: 30px;")),
+                    column(width = 8,
+                           h3("Overview"),
+                           p("American Lobster (Homarus americanus) is a benthic crustacean whose range extends along the Atlantic coast from the Mid-Atlantic region of the US to 
                               Newfoundland, Canada (Waddy & Aiken, 1986), and supports one of the most lucrative fisheries in this region. In 2021, commercial landings reached a 
                               record-high value of 134 million pounds and an ex-vessel value of approximately $875 million (ASFMC, 2021). The Gulf of Maine (GOM) and Georges Bank 
                               (GB) stocks contribute over 90% of US lobster landings (ASMFC, 2020) and while these stocks are not currently overfished (ASMFC, 2020), environmental 
@@ -284,11 +290,30 @@ AL_info<-tabPanel("Range & Info",
                               abundance of lobster populations. American lobsters have a recognized temperature preference between 12 and 18°C (Crossin et al., 1998) and a salinity 
                               preference between 20–32 ppt (Jury et al. 1994; Tanaka and Chen, 2015). Although substrate and habitat preferences vary by life stage, lobsters have 
                               been observed in diverse habitats including cobble, rock, mud, bedrock, sand, peat reefs, and eelgrass beds (Lawton and Lavalli, 1995).",
-                              style = "font-size: 18px;text-align: justify;"),
-                            h4("For more information, click the link below:", style = "padding-top: 40px;"),
-                            tags$li(HTML('<a href="C:/Users/jbehan/Box/Kerr Lab/Fisheries Science Lab/NCLIM/Indicator_Visualizations/Indicator_Visualizations2/papers_writeups/AMliteraturereview.pdf" style="font-size: 18px;" target="_blank">Environmental Effects on American Lobster Stock Dynamics</a>')
-                            ))))
-###### New DF to help classify data for use in creating appropriate plot Y-axis labels #######
+                             style = "font-size: 18px;text-align: justify;"),
+                           h4("For more information, click the link below:", style = "padding-top: 40px;"),
+                           tags$li(HTML('<a href="C:/Users/jbehan/Box/Kerr Lab/Fisheries Science Lab/NCLIM/Indicator_Visualizations/Indicator_Visualizations2/papers_writeups/ALliteraturereview.pdf" style="font-size: 18px;" target="_blank">Environmental Effects on American Lobster Stock Dynamics</a>')
+                           ))))
+AP_info<-tabPanel("Range & Info",
+                  fluidRow(
+                    column(width = 4,
+                           tags$img(src = "Plaice_range.png", 
+                                    style = "width: 100%; height: 100%; object-fit: cover; margin-top: 30px;")),
+                    column(width = 8,
+                           h3("Overview"),
+                           p("American Plaice (Hippoglossoides platessoides)is a North Atlantic flatfish whose range extends from southern Labrador to the 
+                           Mid-Atlantic Bight with the majority of biomass in U.S. waters in the Gulf of Maine and Georges Bank regions. They occupy sandy
+                           mud habitats in depths of 10-700 m, and most commonly occur in 50-100 m during spring and slightly deeper (100-180 m) during 
+                           autumn. American plaice are relatively sedentary but migrate into relatively shallow habitats (<90m) of the western Gulf of Maine
+                           and over southeastern Georges Bank to spawn from January to July, with peak spawning in April and May. American plaice burrow 
+                           in sediment to escape predators and to ambush prey (Salter 2018). They are opportunistic feeders, feeding on mysids, amphipods,
+                           polychaetes, brittle stars,and mollusks as juveniles, then shifting to feed on fish, echinoderms, and bivalves as adults. Small
+                           plaice (<35 cm) are preyed on by cod (Gadus morhua), monkfish (Lophius americanus), and spiny dogfish.",
+                             style = "font-size: 18px;text-align: justify;"),
+                           h4("For more information, click the link below:", style = "padding-top: 40px;"),
+                           tags$a(href = "AmericanPlaice_LitReview.pdf", "Environmental Effects on American Plaice Stock Dynamics", target = "_blank")
+                    )))
+###### New DF to help classify data for use in creating appropriate plot Y-axis labels
 # Create an empty dataframe with columns "Data_name" and "Data_type"
 new_df <- data.frame(Data_name = character(0), Data_type = character(0), stringsAsFactors = FALSE)
 
@@ -323,7 +348,7 @@ for (col_name in colnames(Both2)) {
   y_name <- gsub("\\s+", " ", y_name)  # Reduce multiple spaces to a single space
   
   # Modify Yname based on additional conditions for Yname2 (y_name2 will be used to reduce datanames shown as plot titles to the associated units on the yaxis)
-  y_name2 <- gsub("\\b(Atlantic|River|American|Landings|Striped Bass|lobster|Biomass)\\b", "", y_name)
+  y_name2 <- gsub("\\b(Atlantic|River|American|Landings|Striped Bass|lobster|Biomass|Plaice)\\b", "", y_name)
   y_name2 <- ifelse(grepl("\\bAbundance\\b", y_name), "(Numbers)", y_name2)
   y_name2 <- ifelse(grepl("\\bAbundance Anomaly\\b", y_name), "(Δ Numbers)", y_name2)
   y_name2 <- ifelse(grepl("\\bLandings\\b", y_name), "(mt)", y_name2)
@@ -342,11 +367,13 @@ for (col_name in colnames(Both2)) {
   y_name2 <- ifelse(grepl("\\bCalanus\\b", y_name), "(Abundance Anomaly)", y_name2)
   y_name2 <- ifelse(grepl("\\bForage\\b", y_name), "(Abundance)", y_name2)
   y_name2 <- ifelse(grepl("\\bGSI\\b", y_name), "(Δ Degrees Latitude)", y_name2)
-  y_name2 <- ifelse(grepl("\\bNAO\\b", y_name), "(NAO; Unitless)", y_name2)
+  y_name2 <- ifelse(grepl("\\bNAO\\b", y_name), "(Unitless)", y_name2)
   y_name2 <- ifelse(grepl("\\bHudson River Flow Rate\\b", y_name), "(m3/s)", y_name2)
   y_name2 <- ifelse(grepl("\\bSurface Salinty\\b", y_name), "(so[10^-3])", y_name2)
   y_name2 <- ifelse(grepl("\\bCalfin anomaly\\b", y_name), "(Δ Numbers)", y_name2)
-  
+  y_name2 <- ifelse(grepl("\\bnumtow\\b", y_name), "(Numbers/Tow)", y_name2)
+  y_name2 <- ifelse(grepl("\\bStock Numbers\\b", y_name), "(Numbers)", y_name2)
+  y_name2 <- ifelse(grepl("\\bCondition\\b", y_name), "(Unitless)", y_name2)
   
   # Add a new row to the new dataframe
   new_df <- rbind(new_df, data.frame(Data_name = col_name, Data_type = data_type, Yname = y_name, Yname2 = y_name2, stringsAsFactors = FALSE))
@@ -354,12 +381,12 @@ for (col_name in colnames(Both2)) {
 # Create a named vector mapping Data_name to Yname
 name_mapping <- setNames(new_df$Yname, new_df$Data_name)
 name_mapping2 <- setNames(new_df$Yname2, new_df$Data_name)
-################ Estimate trendlines function ###########
+################ Estimate trendlines function
 # Calculate trendlines for each variable based on dataDf()
 
-################ plotly function for stacked/layered plots ####################
+################ plotly function for stacked/layered plots ##################
 plot_function<-function(plottingstyle,num_variables=num_variables, dataDf=dataDf, all_vars=all_vars, name_mapping=name_mapping, name_mapping2=name_mapping2, show_trendline){
-####supporting functions used throughout plot_function  
+  ####supporting functions used throughout plot_function  
   data_subset <- dataDf() %>%
     filter(if_all(all_of(all_vars), ~ !is.na(.))) %>%
     select(Year, all_of(all_vars))
@@ -374,7 +401,7 @@ plot_function<-function(plottingstyle,num_variables=num_variables, dataDf=dataDf
       rep(NA, nrow(dataDf()))
     }
   })
-####### start plot_function  
+  ####### start plot_function  
   if (plottingstyle == "Layered") {
     
     if (num_variables > 4){ #plot 5 variables together
@@ -510,11 +537,11 @@ plot_function<-function(plottingstyle,num_variables=num_variables, dataDf=dataDf
                   line = list(color = "#00608A")) %>%
         add_trace(data = dataDf(), x = ~Year, y = ~get(all_vars[2]),
                   type = 'scatter', mode = 'lines', name = name_mapping[all_vars[2]],
-      line = list(color = "#ABB400")) %>%
+                  line = list(color = "#ABB400")) %>%
         # Add trendlines if input$trendline is TRUE for the combined trendline_data
         add_trace(data = trendline_data, x = ~Year, y = ~Trendline1,
                   type = 'scatter', mode = 'lines', name = paste(name_mapping[all_vars[1]], "Trend"),
-      line = list(dash = 'dot',color = "#00608A")) %>%
+                  line = list(dash = 'dot',color = "#00608A")) %>%
         add_trace(data = trendline_data, x = ~Year, y = ~Trendline2,
                   type = 'scatter', mode = 'lines', name = paste(name_mapping[all_vars[2]], "Trend"),
                   line = list(dash = 'dot',color = "#ABB400")) %>%
@@ -526,32 +553,32 @@ plot_function<-function(plottingstyle,num_variables=num_variables, dataDf=dataDf
                             zerolinecolor = '#bdbdbd',
                             zerolinewidth = 2,
                             showgrid = FALSE))
-  
+      
     } else { #plot individually if only 1 is selected
       # Create a data frame for plotting trendlines
       trendline_data <- data.frame(Year = dataDf()$Year, 
                                    Trendline1 = trendlines[[1]])  #you have 1 variable
-plot_ly() %>%
-  # Add traces for the selected variables from dataDf()
-  add_trace(data = dataDf(), x = ~Year, y = ~get(all_vars[1]),
-            type = 'scatter', mode = 'lines', name = name_mapping[all_vars[1]],
-            line = list(color = "#00608A")) %>%
-  # Add trendlines if input$trendline is TRUE for the combined trendline_data
-  add_trace(data = trendline_data, x = ~Year, y = ~Trendline1,
-            type = 'scatter', mode = 'lines', name = paste(name_mapping[all_vars[1]], "Trend"),
-            line = list(dash = 'dot',color = "#00608A")) %>%
-  layout(xaxis = list(title = "Year",
-                      zerolinecolor = '#bdbdbd',
-                      zerolinewidth = 2,
-                      showgrid = FALSE),
-         yaxis = list(title = "",
-                      zerolinecolor = '#bdbdbd',
-                      zerolinewidth = 2,
-                      showgrid = FALSE))
-
+      plot_ly() %>%
+        # Add traces for the selected variables from dataDf()
+        add_trace(data = dataDf(), x = ~Year, y = ~get(all_vars[1]),
+                  type = 'scatter', mode = 'lines', name = name_mapping[all_vars[1]],
+                  line = list(color = "#00608A")) %>%
+        # Add trendlines if input$trendline is TRUE for the combined trendline_data
+        add_trace(data = trendline_data, x = ~Year, y = ~Trendline1,
+                  type = 'scatter', mode = 'lines', name = paste(name_mapping[all_vars[1]], "Trend"),
+                  line = list(dash = 'dot',color = "#00608A")) %>%
+        layout(xaxis = list(title = "Year",
+                            zerolinecolor = '#bdbdbd',
+                            zerolinewidth = 2,
+                            showgrid = FALSE),
+               yaxis = list(title = "",
+                            zerolinecolor = '#bdbdbd',
+                            zerolinewidth = 2,
+                            showgrid = FALSE))
+      
     }}#close if layered option
   else {
-   
+    
     plot_list <- lapply(1:num_variables, function(i) {
       y_name <- name_mapping[all_vars[i]]
       y_name2 <- name_mapping2[all_vars[i]]
@@ -603,7 +630,6 @@ plot_ly() %>%
     
     # Display the figure
     fig
-    
   }}
 
 ################ function for datatable ####################
