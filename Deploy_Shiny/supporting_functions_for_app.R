@@ -38,10 +38,13 @@ fish_controls <- function(species, selected_vars, var_name) {
   }
   
   sorted_filtered_columns <- sort(filtered_columns)
-  conditionNames <- gsub("_", " ", filtered_columns)
+  
+  # Process names for display
+  conditionNames <- sorted_filtered_columns  # Start with the original names
+  conditionNames <- gsub("_", " ", conditionNames)  # Replace underscores with spaces
   conditionNames <- gsub("\\b(MAB|COG|ALL|GOM)\\b", "", conditionNames, ignore.case = TRUE)
-  conditionNames <- gsub("^\\s+|\\s+$", "", conditionNames)
-  conditionNames <- gsub("\\s+", " ", conditionNames)
+  conditionNames <- gsub("^\\s+|\\s+$", "", conditionNames)  # Remove leading/trailing spaces
+  conditionNames <- gsub("\\s+", " ", conditionNames)  # Reduce multiple spaces to single
   conditionNames <- gsub("\\bLat\\b", "Latitude", conditionNames)
   conditionNames <- gsub("\\bCalfin anomaly\\b", "C. finmarchicus Anomaly", conditionNames)
   
@@ -53,14 +56,14 @@ fish_controls <- function(species, selected_vars, var_name) {
                      "border-radius: 10px; ", 
                      "padding: 10px; ", 
                      "background-color: rgba(0, 0, 0, 0.2);",
-                     "min-height: 45px;",  # minimum height
-                     "height: auto;",      # auto height
-                     "overflow: hidden;"),  # prevent overflow issues
+                     "min-height: 45px;",
+                     "height: auto;",
+                     "overflow: hidden;"),  
       checkboxGroupInput(
         var_name, 
         label = NULL,
-        choiceNames = sort(conditionNames, decreasing = FALSE),
-        choiceValues = sorted_filtered_columns,
+        choiceNames = conditionNames,  # Use processed names for display
+        choiceValues = sorted_filtered_columns,  # Keep original names for values
         selected = sorted_filtered_columns[1]
       )
     ) 
@@ -376,6 +379,8 @@ for (col_name in colnames(Both2)) {
   y_name2 <- ifelse(grepl("\\bSSB\\b", y_name), "(mt)", y_name2)
   y_name2 <- ifelse(grepl("\\bHarvest\\b", y_name), "(Fish/Year)", y_name2)
   y_name2 <- ifelse(grepl("\\bWeight at Age\\b", y_name), "(kg)", y_name2)
+  y_name2 <- ifelse(grepl("\\bage1\\b", y_name), "(kg)", y_name2)
+  y_name2 <- ifelse(grepl("\\bage6\\b", y_name), "(kg)", y_name2)
   y_name2 <- ifelse(grepl("\\bRecruitment\\b", y_name), "(Numbers)", y_name2)
   y_name2 <- ifelse(grepl("\\b F\\b", y_name), "(%)", y_name2)
   y_name2 <- ifelse(grepl("\\bAtlantic Multidecadal Oscillation\\b", y_name), "(C Anomaly)", y_name2)
@@ -383,18 +388,26 @@ for (col_name in colnames(Both2)) {
   y_name2 <- ifelse(grepl("\\bLat\\b", y_name), "(Decimal Degrees)", y_name2)
   y_name2 <- ifelse(grepl("\\bDepth\\b", y_name), "(meters)", y_name2)
   y_name2 <- ifelse(grepl("\\bAbsolute\\b", y_name), "(C)", y_name2)
+  y_name2 <- ifelse(grepl("\\bbt\\b", y_name), "(C Anomaly)", y_name2)
+  y_name2 <- ifelse(grepl("\\bsst\\b", y_name), "(C Anomaly)", y_name2)
   y_name2 <- ifelse(grepl("\\bTemperature\\b", y_name), "(C Anomaly)", y_name2)
   y_name2 <- ifelse(grepl("\\bTemp Anomaly\\b", y_name), "(C Anomaly)", y_name2)
   y_name2 <- ifelse(grepl("\\bCalanus\\b", y_name), "(Abundance Anomaly)", y_name2)
+  y_name2 <- ifelse(grepl("\\bcalfin\\b", y_name), "(Abundance Anomaly)", y_name2)
+  y_name2 <- ifelse(grepl("\\bpseudo\\b", y_name), "(Abundance Anomaly)", y_name2)
   y_name2 <- ifelse(grepl("\\bForage\\b", y_name), "(Abundance)", y_name2)
   y_name2 <- ifelse(grepl("\\bGulf Stream Index\\b", y_name), "(Δ Degrees Latitude)", y_name2)
+  y_name2 <- ifelse(grepl("\\bGSI\\b", y_name), "(Δ Degrees Latitude)", y_name2)
   y_name2 <- ifelse(grepl("\\bNorth Atlantic Oscillation\\b", y_name), "(Unitless)", y_name2)
   y_name2 <- ifelse(grepl("\\bHudson River Flow Rate\\b", y_name), "(m3/s)", y_name2)
   y_name2 <- ifelse(grepl("\\bSurface Salinty\\b", y_name), "(so[10^-3])", y_name2)
   y_name2 <- ifelse(grepl("\\bCalfin anomaly\\b", y_name), "(Δ Numbers)", y_name2)
   y_name2 <- ifelse(grepl("\\b_Age_1_Numbers_per_Tow\\b", y_name), "(Numbers/Tow)", y_name2)
+  y_name2 <- ifelse(grepl("\\bAge.1\\b", y_name), "(Numbers/Tow)", y_name2)
   y_name2 <- ifelse(grepl("\\bStock Size\\b", y_name), "(Thousands of Fish)", y_name2)
   y_name2 <- ifelse(grepl("\\bCondition\\b", y_name), "(Unitless)", y_name2)
+  y_name2 <- ifelse(grepl("\\bK rel\\b", y_name), "(Unitless)", y_name2)
+  y_name2 <- ifelse(grepl("\\bHeatwave\\b", y_name), "(C Anomaly)", y_name2)
   
   # Add a new row to the new dataframe
   new_df <- rbind(new_df, data.frame(Data_name = col_name, Data_type = data_type, Yname = y_name, Yname2 = y_name2, stringsAsFactors = FALSE))
@@ -402,6 +415,27 @@ for (col_name in colnames(Both2)) {
 # Create a named vector mapping Data_name to Yname
 name_mapping <- setNames(new_df$Yname, new_df$Data_name)
 name_mapping2 <- setNames(new_df$Yname2, new_df$Data_name)
+################ Function to Format Names for Cod Tab ###################
+# Function to format names
+format_names <- function(names) {
+  formatted <- gsub("_", " ", names)
+  formatted <- gsub("\\b(WGOM|EGOM|GBK|SNE)\\b", "", formatted, ignore.case = TRUE)
+  formatted <- gsub("^\\s+|\\s+$", "", formatted)
+  formatted <- gsub("\\s+", " ", formatted)
+  formatted <- gsub("\\bLat\\b", "Latitude", formatted)
+  formatted <- gsub("\\bcalfin\\b", "C. finmarchicus Abundance Anomaly", formatted)
+  formatted <- gsub("\\bpseudo\\b", "Pseudocalanus spp. Abundance Anomaly", formatted)
+  formatted <- gsub("\\b100m3\\b", "per 100m³", formatted)
+  formatted <- gsub("\\bbt\\b", "Bottom Water Temperature", formatted)
+  formatted <- gsub("\\bsst\\b", "Sea Surface Temperature", formatted)
+  formatted <- gsub("\\bGSI\\b", "Gulf Stream Index", formatted)
+  formatted <- gsub("\\bAge.1\\b", "Age 1 Abundance", formatted)
+  formatted <- gsub("\\bSSB\\b", "Spawning Stock Biomass", formatted)
+  formatted <- gsub("\\bage1 anomaly\\b", "Weight at Age 1 Anomaly", formatted)
+  formatted <- gsub("\\bage6 anomaly\\b", "Weight at Age 6 Anomaly", formatted)
+  formatted <- gsub("\\bK rel\\b", "Relative Condition", formatted)
+  return(formatted)
+}
 ################ Estimate trendlines function
 # Calculate trendlines for each variable based on dataDf()
 
@@ -694,6 +728,7 @@ plot_function<-function(plottingstyle,num_variables=num_variables, dataDf=dataDf
         stop(paste("Variable at position", i, "is missing or invalid."))
       }
       y_name <- name_mapping[all_vars[i]]
+      plot_title <- format_names(name_mapping[all_vars[i]])
       y_name2 <- name_mapping2[all_vars[i]]
       # Initialize empty trendline and LTA values
       trendline_values <- rep(NA, nrow(dataDf()))
@@ -742,7 +777,8 @@ plot_function<-function(plottingstyle,num_variables=num_variables, dataDf=dataDf
           xaxis = list(showgrid = FALSE, zeroline = FALSE),
           annotations = list(
             list(
-              text = y_name,
+              #text = y_name,
+              text = plot_title,
               x = 0,
               y = 1,
               xref = "paper",

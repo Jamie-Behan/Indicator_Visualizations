@@ -290,14 +290,17 @@ ui <- dashboardPage(
                                 tabPanel(
                                   "Interactive Plots",
                                   h2("Choose Stock and Environmental Variables", style = "font-weight: bold;"),
-                                  selectInput(
-                                    "AC_stock_area",
-                                    "Select Stock Area",
-                                    choices = c("Western Gulf of Maine" = "WGOM",
-                                                "Eastern Gulf of Maine" = "EGOM",
-                                                "Georges Bank" = "GBK",
-                                                "Southern New England" = "SNE"),
-                                    selected = "WGOM"
+                                  div(
+                                    h4("Select Stock Area", style = "font-weight: bold;"),
+                                    selectInput(
+                                      "AC_stock_area",
+                                      label = NULL,  # Remove the default label since we're using h3
+                                      choices = c("Western Gulf of Maine" = "WGOM",
+                                                  "Eastern Gulf of Maine" = "EGOM",
+                                                  "Georges Bank" = "GBK",
+                                                  "Southern New England" = "SNE"),
+                                      selected = "WGOM"
+                                    )
                                   ),
                                   fluidRow(
                                     column(
@@ -335,12 +338,11 @@ ui <- dashboardPage(
                                       h4("Abiotic", style = "font-weight: bold;"),
                                       div(class = "fish-controls",fish_controls(c("Annual_Bottom_Temp_Absolute_GOM","SST_Temp_Anomaly_GOM","Bottom_Temp_Anomaly_GOM","GLORYS_Bottom_Temp_Anomaly_GOM",
                                                                                   "bt_anomaly_EGOM_Fall","bt_anomaly_EGOM_Spring","bt_anomaly_GBK_Fall","bt_anomaly_GBK_Spring","bt_anomaly_SNE_Fall","bt_anomaly_SNE_Spring","bt_anomaly_WGOM_Fall","bt_anomaly_WGOM_Spring",
-                                                                                  "GSI_EGOM_Fall","GSI_EGOM_Spring","GSI_GBK_Fall","GSI_GBK_Spring","GSI_SNE_Fall","GSI_SNE_Spring","GSI_WGOM_Fall","GSI_WGOM_Spring" ,        
-                                                                                  "Heatwave_EGOM_Fall","Heatwave_EGOM_Spring","Heatwave_GBK_Fall","Heatwave_GBK_Spring","Heatwave_SNE_Fall","Heatwave_SNE_Spring","Heatwave_WGOM_Fall","Heatwave_WGOM_Spring",
-                                                                                  "sst_anomaly_EGOM_Fall","sst_anomaly_EGOM_Spring","sst_anomaly_GBK_Fall","sst_anomaly_GBK_Spring","sst_anomaly_SNE_Fall","sst_anomaly_SNE_Spring","sst_anomaly_WGOM_Fall","sst_anomaly_WGOM_Spring"),var_name="AC_Abiotic_variable")),
+                                                                                  "GSI_EGOM","GSI_GBK","GSI_SNE","GSI_WGOM" ,"Heatwave_EGOM","Heatwave_GBK","Heatwave_SNE","Heatwave_WGOM",
+                                                                                  "sst_anomaly_EGOM","sst_anomaly_GBK","sst_anomaly_SNE","sst_anomaly_WGOM"),var_name="AC_Abiotic_variable")),
                                       h4("Biotic", style = "font-weight: bold;"),
-                                      div(class = "fish-controls",fish_controls(c("calfin_100m3_EGOM_Fall","calfin_100m3_EGOM_Spring","calfin_100m3_GBK_Fall","calfin_100m3_GBK_Spring","calfin_100m3_SNE_Fall","calfin_100m3_SNE_Spring","calfin_100m3_WGOM_Fall","calfin_100m3_WGOM_Spring",
-                                                                                  "pseudo_100m3_EGOM_Fall","pseudo_100m3_EGOM_Spring","pseudo_100m3_GBK_Fall","pseudo_100m3_GBK_Spring","pseudo_100m3_SNE_Fall","pseudo_100m3_SNE_Spring","pseudo_100m3_WGOM_Fall","pseudo_100m3_WGOM_Spring"),var_name="AC_Biotic_variable"))
+                                      div(class = "fish-controls",fish_controls(c("calfin_100m3_EGOM","calfin_100m3_GBK","calfin_100m3_SNE","calfin_100m3_WGOM",
+                                                                                  "pseudo_100m3_EGOM","pseudo_100m3_GBK","pseudo_100m3_SNE","pseudo_100m3_WGOM"),var_name="AC_Biotic_variable"))
                                     )),
                                   mainPanel(
                                     width = 12,
@@ -377,45 +379,45 @@ server <- function(input, output, session) {
                           "SSB_WGOM_Spring","SSB_WGOM_Fall","SSB_EGOM_Spring","SSB_EGOM_Fall",
                           "SSB_GBK_Spring","SSB_GBK_Fall","SSB_SNE_Spring","SSB_SNE_Fall")
     filtered_recruitment <- recruitment_vars[grep(selected_area, recruitment_vars)]
-    updateCheckboxGroupInput(session, "AC_recruitment_variable", choices = filtered_recruitment)
+    updateCheckboxGroupInput(session, "AC_recruitment_variable", 
+                             choiceNames = format_names(filtered_recruitment),
+                             choiceValues = filtered_recruitment)
     
     # Filter distribution variables
     distribution_vars <- c("Cod_Depth_Spring","Cod_Lat_Spring","Cod_Depth_Fall","Cod_Lat_Fall")
-    # Note: Distribution vars don't have area in their names, so we'll keep all of them
-    updateCheckboxGroupInput(session, "AC_distribution_variable", choices = distribution_vars)
+    updateCheckboxGroupInput(session, "AC_distribution_variable", 
+                             choiceNames = format_names(distribution_vars),
+                             choiceValues = distribution_vars)
     
     # Filter growth variables
     growth_vars <- c("K_rel_WGOM_Spring","K_rel_WGOM_Fall","K_rel_EGOM_Spring","K_rel_EGOM_Fall",
                      "K_rel_GBK_Spring","K_rel_GBK_Fall","K_rel_SNE_Spring","K_rel_SNE_Fall",
-                     "Age.1_EGOM_Fall","Age.1_EGOM_Spring","Age.1_GBK_Fall","Age.1_GBK_Spring",
-                     "Age.1_SNE_Fall","Age.1_SNE_Spring","Age.1_WGOM_Fall","Age.1_WGOM_Spring")
+                     "age1_anomaly_EGOM_Spring","age1_anomaly_GBK_Fall","age1_anomaly_GBK_Spring","age1_anomaly_WGOM_Fall",  
+                     "age1_anomaly_WGOM_Spring","age6_anomaly_GBK_Spring","age6_anomaly_WGOM_Fall","age6_anomaly_WGOM_Spring")
     filtered_growth <- growth_vars[grep(selected_area, growth_vars)]
-    updateCheckboxGroupInput(session, "AC_growth_variable", choices = filtered_growth)
+    updateCheckboxGroupInput(session, "AC_growth_variable", 
+                             choiceNames = format_names(filtered_growth),
+                             choiceValues = filtered_growth)
     
     # Filter abiotic variables
     abiotic_vars <- c("bt_anomaly_EGOM_Fall","bt_anomaly_EGOM_Spring","bt_anomaly_GBK_Fall",
                       "bt_anomaly_GBK_Spring","bt_anomaly_SNE_Fall","bt_anomaly_SNE_Spring",
                       "bt_anomaly_WGOM_Fall","bt_anomaly_WGOM_Spring",
-                      "GSI_EGOM_Fall","GSI_EGOM_Spring","GSI_GBK_Fall","GSI_GBK_Spring",
-                      "GSI_SNE_Fall","GSI_SNE_Spring","GSI_WGOM_Fall","GSI_WGOM_Spring",
-                      "Heatwave_EGOM_Fall","Heatwave_EGOM_Spring","Heatwave_GBK_Fall",
-                      "Heatwave_GBK_Spring","Heatwave_SNE_Fall","Heatwave_SNE_Spring",
-                      "Heatwave_WGOM_Fall","Heatwave_WGOM_Spring",
-                      "sst_anomaly_EGOM_Fall","sst_anomaly_EGOM_Spring","sst_anomaly_GBK_Fall",
-                      "sst_anomaly_GBK_Spring","sst_anomaly_SNE_Fall","sst_anomaly_SNE_Spring",
-                      "sst_anomaly_WGOM_Fall","sst_anomaly_WGOM_Spring")
+                      "GSI_EGOM","GSI_GBK","GSI_SNE","GSI_WGOM",
+                      "Heatwave_EGOM","Heatwave_GBK","Heatwave_SNE","Heatwave_WGOM",
+                      "sst_anomaly_EGOM","sst_anomaly_GBK","sst_anomaly_SNE","sst_anomaly_WGOM")
     filtered_abiotic <- abiotic_vars[grep(selected_area, abiotic_vars)]
-    updateCheckboxGroupInput(session, "AC_Abiotic_variable", choices = filtered_abiotic)
+    updateCheckboxGroupInput(session, "AC_Abiotic_variable", 
+                             choiceNames = format_names(filtered_abiotic),
+                             choiceValues = filtered_abiotic)
     
     # Filter biotic variables
-    biotic_vars <- c("calfin_100m3_EGOM_Fall","calfin_100m3_EGOM_Spring","calfin_100m3_GBK_Fall",
-                     "calfin_100m3_GBK_Spring","calfin_100m3_SNE_Fall","calfin_100m3_SNE_Spring",
-                     "calfin_100m3_WGOM_Fall","calfin_100m3_WGOM_Spring",
-                     "pseudo_100m3_EGOM_Fall","pseudo_100m3_EGOM_Spring","pseudo_100m3_GBK_Fall",
-                     "pseudo_100m3_GBK_Spring","pseudo_100m3_SNE_Fall","pseudo_100m3_SNE_Spring",
-                     "pseudo_100m3_WGOM_Fall","pseudo_100m3_WGOM_Spring")
+    biotic_vars <- c("calfin_100m3_EGOM","calfin_100m3_GBK","calfin_100m3_SNE","calfin_100m3_WGOM",
+                     "pseudo_100m3_EGOM","pseudo_100m3_GBK","pseudo_100m3_SNE","pseudo_100m3_WGOM")
     filtered_biotic <- biotic_vars[grep(selected_area, biotic_vars)]
-    updateCheckboxGroupInput(session, "AC_Biotic_variable", choices = filtered_biotic)
+    updateCheckboxGroupInput(session, "AC_Biotic_variable", 
+                             choiceNames = format_names(filtered_biotic),
+                             choiceValues = filtered_biotic)
   })
   # End of new code for cod page #
   # Rest of Server Code for reactive plots #
