@@ -377,7 +377,9 @@ server <- function(input, output, session) {
     recruitment_vars <- c("Age.1_WGOM_Spring","Age.1_WGOM_Fall","Age.1_EGOM_Spring","Age.1_EGOM_Fall",
                           "Age.1_GBK_Spring","Age.1_GBK_Fall","Age.1_SNE_Spring","Age.1_SNE_Fall",
                           "SSB_WGOM_Spring","SSB_WGOM_Fall","SSB_EGOM_Spring","SSB_EGOM_Fall",
-                          "SSB_GBK_Spring","SSB_GBK_Fall","SSB_SNE_Spring","SSB_SNE_Fall")
+                          "SSB_GBK_Spring","SSB_GBK_Fall","SSB_SNE_Spring","SSB_SNE_Fall",
+                          "RSSB_WGOM_Spring","RSSB_WGOM_Fall","RSSB_EGOM_Spring","RSSB_EGOM_Fall",
+                          "RSSB_GBK_Spring","RSSB_GBK_Fall","RSSB_SNE_Spring","RSSB_SNE_Fall")
     filtered_recruitment <- recruitment_vars[grep(selected_area, recruitment_vars)]
     updateCheckboxGroupInput(session, "AC_recruitment_variable", 
                              choiceNames = format_names(filtered_recruitment),

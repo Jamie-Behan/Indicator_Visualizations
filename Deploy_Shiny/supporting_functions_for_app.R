@@ -408,6 +408,7 @@ for (col_name in colnames(Both2)) {
   y_name2 <- ifelse(grepl("\\bCondition\\b", y_name), "(Unitless)", y_name2)
   y_name2 <- ifelse(grepl("\\bK rel\\b", y_name), "(Unitless)", y_name2)
   y_name2 <- ifelse(grepl("\\bHeatwave\\b", y_name), "(C Anomaly)", y_name2)
+  y_name2 <- ifelse(grepl("\\bRSSB\\b", y_name), "(R/SSB in year-1 (kg))", y_name2)
   
   # Add a new row to the new dataframe
   new_df <- rbind(new_df, data.frame(Data_name = col_name, Data_type = data_type, Yname = y_name, Yname2 = y_name2, stringsAsFactors = FALSE))
@@ -433,7 +434,9 @@ format_names <- function(names) {
   formatted <- gsub("\\bSSB\\b", "Spawning Stock Biomass", formatted)
   formatted <- gsub("\\bage1 anomaly\\b", "Weight at Age 1 Anomaly", formatted)
   formatted <- gsub("\\bage6 anomaly\\b", "Weight at Age 6 Anomaly", formatted)
+  formatted <- gsub("\\bHeatwave\\b", "Cumulative Heatwave", formatted)
   formatted <- gsub("\\bK rel\\b", "Relative Condition", formatted)
+  formatted <- gsub("\\bRSSB\\b", "Recruits/Spawning Stock Biomass", formatted)
   return(formatted)
 }
 ################ Estimate trendlines function
