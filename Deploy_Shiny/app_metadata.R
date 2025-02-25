@@ -11,14 +11,20 @@ metadata <-tabItem(tabName = "Metadata",
                      accordion(
                        id = "accordion1",
                        accordionItem(
-                         title = "Annual AMO:",
+                         title = "Annual Atlantic Multidecadal Oscillation (AMO):",
                          status = "primary",
-                         "AMO (Atlantic Multidecadal Oscillation) Index. These data represent annual means of the NOAA Physical Sciences Laboratory's unsmoothed short monthly AMO dataset found at https://psl.noaa.gov/data/timeseries/AMO/. 1948-present. These data represent the weighted average over the N Atlantic from 0 to 70N, and have been detrended."
+                         "Atlantic Multidecadal Oscillation (AMO) Index. These data represent annual means of the NOAA Physical Sciences Laboratory's unsmoothed short monthly AMO dataset found at https://psl.noaa.gov/data/timeseries/AMO/. 1948-present. These data represent the weighted average over the N Atlantic from 0 to 70N, and have been detrended."
                        ),
                        accordionItem(
                          title = "Atlantic Herring Seasonal Latitude and Depth (Prey)",
                          status = "primary",
                          "Atlantic Herring Seasonal Latitude (Decimal Degrees) and Depth (m) are sourced from the NOAA Fisheries' Distribution Mapping and Analysis Portal (DisMAP). Data represent the mean center of gravity (geographic center) metrics from the NEFSC bottom trawl survey. Metrics were calculated as biomass-weighted averages of depth and latitude, weighted by the interpolated biomass at each depth or latitude for each year and season (fall, spring) of the bottom trawl survey.  See https://apps-st.fisheries.noaa.gov/dismap/ for more info. "
+                       ),
+                       accordionItem(
+                         title = "Bottom Temperature Absolute",
+                         status = "primary",
+                         "Annual bottom temperatures for the Gulf of Maine (GOM) region. Bottom Temperature data collected from NEFSC survey from 1977-present. 
+                                        In ℃.Data are sourced from the R package 'ecodata'. See https://noaa-edab.github.io/tech-doc/ for more info."
                        ),
                        accordionItem(
                          title = "In-situ Bottom Temperature Anomaly (NEFSC)",
@@ -34,11 +40,32 @@ metadata <-tabItem(tabName = "Metadata",
                                           See https://noaa-edab.github.io/tech-doc/ for more info."
                        ),
                        accordionItem(
+                         title = "Bottom Temperature Anomaly (for Atlantic cod page)",
+                         status = "primary",
+                         "Atlantic cod Bottom water temperature data were sourced from the high-resolution, long-term bottom temperature product for the Northeast U.S. continental shelf, as described in du Pontavice et al. (2023). 
+                         To characterize the bottom temperature environment fish were experiencing prior to capture, means over the six months prior to the start of each seasonal NEFSC Bottom Trawl survey were used. Temperature anomalies were calculated for the years 1982-2019, using 1982-2011 as a reference baseline period for comparison."
+                       ),
+                       accordionItem(
                          title = "Calanus Abundance Anomaly",
                          status = "primary",
-                         "Calanus finmarchicus abundance anomalies for the GOM region. Data are sourced from the R package 'ecodata'. See https://noaa-edab.github.io/tech-doc/ for more info. "
+                         "For species other than Atlantic cod, Calanus finmarchicus abundance anomalies for the GOM region. Data are sourced from the R package 'ecodata'. See https://noaa-edab.github.io/tech-doc/ for more info. "
                        ),
-                       
+                       accordionItem(
+                         title = "Calanus finmarchicus and Pseudocalanus spp. Abundance Anomalies /100m^3",
+                         status = "primary",
+                         "For the Atlantic cod data specifically, Zooplankton abundance data were sourced from the NOAA Ecosystem Monitoring (EcoMon) program. 
+                         For the EGOM & WGOM stock area models, summer zooplankton survey months (June-August) were used, and in GBK and SNE stock area models, 
+                         spring zooplankton survey months (March-May) were used as these time periods align with the start of, or begin just after, the peak 
+                         spawning period for cod, when cod larvae would likely be feeding on zooplankton (Kane 1984; Heath and Lough 2007; Jacobsen et al. 2020). 
+                         All zooplankton data were lagged one year and were subsetted to match cod stock areas."
+                       ),
+                       accordionItem(
+                         title = "Cumulative Heatwave Index",
+                         status = "primary",
+                         "For the Atlantic cod species page, annual cumulative marine heatwave data were provided by the Northeast Fisheries Science Center via ecodata. 
+                         The marine heatwave dataset was masked to the Atlantic cod research track working group stock regions. 
+                         This dataset can be found under “ESP_heatwave_cod” in the ecodata R. See https://noaa-edab.github.io/tech-doc/ for more info."
+                       ),
                        accordionItem(
                          title = "Forage Fish Index",
                          status = "primary",
@@ -73,9 +100,9 @@ metadata <-tabItem(tabName = "Metadata",
                                           See https://noaa-edab.github.io/tech-doc/ for more info."
                        ),
                        accordionItem(
-                         title = "GSI",
+                         title = "Gulf Stream Index (GSI)",
                          status = "primary",
-                         "Annual time series of the Gulf Stream Index. Positive values are a more northerly Gulf Stream, and Negative values are a more southerly Gulf Stream. Anomalies of latitudinal position. 1954-present.
+                         "Annual time series of the Gulf Stream Index (GSI). Positive values are a more northerly Gulf Stream, and Negative values are a more southerly Gulf Stream. Anomalies of latitudinal position. 1954-present.
                                           Data are sourced from the R package 'ecodata'. See https://noaa-edab.github.io/tech-doc/ for more info."
                        ),
                        accordionItem(
@@ -85,24 +112,29 @@ metadata <-tabItem(tabName = "Metadata",
                                           Data are sourced from the R package 'ecodata'. See https://noaa-edab.github.io/tech-doc/ for more info."
                        ),
                        accordionItem(
-                         title = "NAO",
+                         title = "North Atlantic Oscillation (NAO)",
                          status = "primary",
                          "North Atlantic Oscillation (NAO). Unit-less. 1864-present. Data are sourced from the R package 'ecodata'. 
                                           See https://noaa-edab.github.io/tech-doc/ for more info."
                        ),
-                       #                       accordionItem(
-                       #                         title = "OISST Anomaly (Season)",
-                       #                         status = "primary",
-                       #                         "SST anomalies for the GOM region for either the winter, spring, summer, or fall season. These data were derived from the NOAA Optimum Interpolation SST High Resolution data set (NOAA OISST V2). 
-                       #                                          The 1982-2020 climatology was used to calculate anomalies.1982-present. In ℃.  Data are sourced from the R package 'ecodata'. 
-                       #                                          See https://noaa-edab.github.io/tech-doc/ for more info."
-                       #                       ),
+                      accordionItem(
+                         title = "Sea Surface Temperature Anomaly (for Atlantic cod page)",
+                         status = "primary",
+                         "Sea surface temperature (SST) data used in the Atlantic cod page were sourced from the National Oceanic and Atmospheric Administration (NOAA) Physical Sciences Laboratory. 
+                         Optimum Interpolation Sea Surface Temperature (NOAA OISST V2) data were used, a long-term record of climate data that utilizes multiple data collection platforms into a global grid. 
+                         Data were masked to cod stock regions and a monthly spatial average was calculated for each stock area. SST data were averaged over a four-month 
+                         recruitment period, which was temporally aligned with the beginning of the peak spawning period of the previous year for each stock area. 
+                         4-month means were chosen as cod eggs are buoyant and range between 90-150 days in settlement timing (McBride and Smedbol 2022). 
+                         Years 1982-2011 of the corresponding 4-month time periods were used as the reference base period to calculate the final SST anomaly datasets for each season.
+                         In ℃."
+                         ),
                        accordionItem(
                          title = "In-situ SST Anomaly (NEFSC)",
                          status = "primary",
                          "Annual SST anomalies for the GOM region. SST data collected from NEFSC survey from 1977-present. 
                                           In ℃. Data are sourced from the R package 'ecodata'. See https://noaa-edab.github.io/tech-doc/ for more info."
                        ),
+
                        accordionItem(
                          title = "Sea Surface Salinity",
                          status = "primary",
@@ -209,7 +241,7 @@ metadata <-tabItem(tabName = "Metadata",
                      ),
                      #####American Lobster accordion#####
                      accordion(
-                       id = "accordion3",
+                       id = "accordion4",
                        accordionItem(
                          title = "American Lobster (Homarus americanus):",
                          status = "success",
@@ -224,7 +256,7 @@ metadata <-tabItem(tabName = "Metadata",
                      ),
                      #####American Plaice accordion#####
                      accordion(
-                       id = "accordion4",
+                       id = "accordion5",
                        accordionItem(
                          title = "American Plaice (Hippoglossoides platessoides):",
                          status = "success",
@@ -258,6 +290,65 @@ metadata <-tabItem(tabName = "Metadata",
                            status = "primary",
                            collapsed = FALSE,
                            " Relative condition index data were calculated as the ratio of observed weight to predicted weight at a given length from the fall NEFSC trawl survey from 1992-2019 (NEFSC 2022). These data included American plaice relative condition indices for the Gulf of Maine region and are filtered to only include years with at least 3 samples."
+                         ),
+                       )
+                     ),
+                     #####Atlantic Cod accordion#####
+                     accordion(
+                       id = "accordion6",
+                       accordionItem(
+                         title = "Atlantic cod (Gadus morhua):",
+                         status = "success",
+                         collapsed = TRUE,
+                         accordionItem(
+                           title = "Atlantic cod Seasonal Latitude and Depth",
+                           status = "primary",
+                           collapsed = FALSE,
+                           "Atlantic cod Seasonal Latitude (Decimal Degrees) and Depth (m) are sourced from the NOAA Fisheries' Distribution Mapping 
+                           Analysis Portal (DisMAP). Data represent the mean center of gravity (geographic center) metrics from the NEFSC bottom trawl 
+                           survey. Metrics were calculated as biomass-weighted averages of depth and latitude, weighted by the interpolated biomass at 
+                           each depth or latitude for each year and season (fall, spring) of the bottom trawl survey.  
+                           See https://apps-st.fisheries.noaa.gov/dismap/ for more info. "
+                         ),
+                         accordionItem(
+                           title = "Atlantic cod Spawning Stock Biomass (SSB; mt)",
+                           status = "primary",
+                           collapsed = FALSE,
+                           "Atlantic cod Spawning Stock Biomass (SSB). Units are in metric tons (mt).
+                           Spawning stock biomass (SSB) data were estimated using spring and fall NEFSC bottom trawl survey numbers at age and weights at age for cod ages 4+. 
+                           The aggregate biomass for these indices was calculated for each year (1982-2019) and for each season, in units of kg/tow."
+                         ),
+                         accordionItem(
+                           title = "Atlantic cod Recruits per Spawning Stock Biomass (R/SSB)",
+                           status = "primary",
+                           collapsed = FALSE,
+                           "Annual abundance of age 1 fish from the NEFSC trawl survey were used for recruitment data (see Atlantic cod Age 1 Abundance).
+                           See Atlantic cod Spawning Stock Biomass for more information on the SSB data used. Recruits per spawner was used here as a metric of recruitment success. 
+                           These data were calculated as recruitment = index of abundance at age 1 in year t per SSB in year t-1 for each season and year, e.g., Rt/SSBt-1. "
+                         ),
+                         accordionItem(
+                           title = "Atlantic cod Age 1 Abundance (numbers/tow)",
+                           status = "primary",
+                           collapsed = FALSE,
+                           "Standardized stratified mean number per tow of age 1 Atlantic cod in the NEFSC spring and fall research bottom trawl survey in each stock area (WGOM, EGOM, GBK, and SNE)."
+                         ),
+                         accordionItem(
+                           title = "Atlantic cod Mean Relative Condition",
+                           status = "primary",
+                           collapsed = FALSE,
+                           " Relative condition index data were calculated as the ratio of observed weight to predicted weight at a given length from the 
+                           fall NEFSC trawl survey from 1992-2019 (NEFSC 2022). These data included Atlantic cod relative condition indices for each stock are and are filtered to only include years with at least 3 samples."
+                         ),
+                         accordionItem(
+                           title = "Atlantic cod Weight at Age (WAA) for ages 1 or 6",
+                           status = "primary",
+                           collapsed = FALSE,
+                           "Atlantic cod WAA anomalies were calculated from the NEFSC Bottom Trawl survey for ages 1 and 6 from 1982-2019. Ages 1 and 6
+                           were used as Age 1 is useful for seeing trends in recruited fish to the fishery, while age 6 cod are considered to be 100% 
+                           fully mature by that age, and is thus useful for looking at WAA trends of mature fish.
+                           Weight at age data were limited, especially for SNE and EGOM stocks. Only stocks and ages which had >30 years of 
+                           data were used and 1982-2011 base-periods (or as close to that range as possible while still maintaining 30 years for a base 
+                           period) were used to calculate the means for the anomaly calculations. Data was included as available, so not every stock area or season may have both ages available."
                          ),
                        )
                      ),
