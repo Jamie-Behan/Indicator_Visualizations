@@ -4,7 +4,7 @@ pacman::p_load(dplyr,plotly,stats,reshape2,data.table,terra,utils,stringr,instal
 library(remotes)
 #library(pak)
 #pak::pkg_install("noaa-edab/ecodata")
-#remotes::install_github("noaa-edab/ecodata",build_vignettes=TRUE,force = TRUE)
+#remotes::install_github("noaa-edab/ecodata",build=FALSE,force = TRUE) #use this line and uninstall/reinstall manually any packages that may not be automatically doing it through running this line, then rerun after all packages are up to date
 require(ecodata)
 ##### Bottom Temp & sst anomaly dataset#########
 ecodata_df<-as.data.frame(ecodata::bottom_temp[c(1:4)])
